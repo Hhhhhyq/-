@@ -1,0 +1,1 @@
+<view class="home"><view class="home-top"><swiper class="swiper" autoplay="true"><swiper-item>1</swiper-item><swiper-item>2</swiper-item><swiper-item>3</swiper-item></swiper></view><u--input class="home-input" vue-id="1da55560-1" placeholder="搜索" prefixIcon="search" prefixIconStyle="font-size: 22px;color: #909399" bind:__l="__l"></u--input><view></view></view>

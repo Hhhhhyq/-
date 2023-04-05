@@ -1,0 +1,200 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/home/home",
+			"style": {
+				"enablePullDownRefresh": false,
+				"navigationBarTitleText": "失物招领",
+				"navigationBarTextStyle": "black",
+				"navigationBarBackgroundColor":"#fff"
+			}
+		}, {
+			"path": "pages/text/text",
+			"style": {
+				"navigationBarTitleText": "消息",
+				"enablePullDownRefresh": false,
+				"navigationBarTextStyle": "black"
+			}
+
+		},
+		{
+			"path": "pages/my/my",
+			"style": {
+				"navigationBarTitleText": "个人中心",
+				"enablePullDownRefresh": false,
+				"navigationBarTextStyle": "white",
+				"navigationStyle": "custom",
+				"app-plus" :{
+					"titleView": false,
+                    "titleNView": false
+                }
+			}
+		}, {
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录",
+				"enablePullDownRefresh": false,
+				"navigationBarTextStyle": "black"
+			}
+
+		}, {
+			"path": "pages/register/register",
+			"style": {
+				"navigationBarTitleText": "注册",
+				"enablePullDownRefresh": false,
+				"navigationBarTextStyle": "black"
+			}
+
+		},{
+            "path" : "pages/release/release",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+				"navigationBarTextStyle": "black",
+				"app-plus" :{
+					"titleView": false,
+				    "titleNView": false
+				}
+            }
+            
+        }
+        ,{
+            "path" : "pages/edit/edit",
+            "style" :
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+            	"navigationBarTextStyle": "black",
+            	"app-plus" :{
+            		"titleView": false,
+            	    "titleNView": false
+            	}
+            }
+        }
+        ,{
+            "path" : "pages/detail/detail",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+				"navigationBarTextStyle": "black",
+				"app-plus" :{
+					"titleView": false,
+				    "titleNView": false
+				}
+            }
+        },
+		{
+		    "path" : "pages/conversation/conversation",
+		    "style" :                                                                                    
+		    {
+		        "navigationBarTitleText": "",
+		        "enablePullDownRefresh": false,
+				"navigationBarTextStyle": "black",
+				"app-plus" :{
+					"titleView": false,
+				    "titleNView": false
+				}
+		    }
+		}
+        ,{
+            "path" : "pages/community/community",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": true
+            },
+			"onReachBottomDistance":"200rpx"
+            
+        }
+        ,{
+            "path" : "pages/chatPage/chatPage",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/allGoods/allGoods",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/editPassword/editPassword",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/editArtical/editArtical",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        },{
+            "path" : "pages/articalDetail/articalDetail",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+    ],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#fcaf17",
+		"backgroundColor": "#ffffff",
+		"scrollIndicator": "none",
+		"navigationStyle": "custom", //以下两条取消头部导航
+		"app-plus": {
+			"titleView": false,
+			"titleNView":false
+		}
+	},
+	"tabBar": {
+		"color": "#000",
+		"selectedColor": "#56bbb5",
+		"borderStyle": "#cccccc",
+		"backgroundColor": "#ffffff",
+		"list": [{
+				"pagePath": "pages/home/home",
+				"iconPath": "static/image/home.png",
+				"selectedIconPath": "static/image/home-on.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/text/text",
+				"iconPath": "static/image/txt.png",
+				"selectedIconPath": "static/image/txt-on.png",
+				"text": "消息"
+			},
+			{
+				"pagePath": "pages/community/community",
+				"iconPath": "static/image/community.png",
+				"selectedIconPath": "static/image/community-on.png",
+				"text": "社区"
+			},
+			{
+				"pagePath": "pages/my/my",
+				"iconPath": "static/image/my.png",
+				"selectedIconPath": "static/image/my-on.png",
+				"text": "个人中心"
+			}
+		]
+	},
+	"uniIdRouter": {}
+}

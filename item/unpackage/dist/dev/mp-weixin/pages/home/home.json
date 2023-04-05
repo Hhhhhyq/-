@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "失物招领",
+  "usingComponents": {
+    "u--input": "/uni_modules/uview-ui/components/u--input/u--input"
+  }
+}
