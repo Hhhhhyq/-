@@ -28,7 +28,7 @@
 				<view class="bot-icons">
 					<view class="icon icon1" @click="changeInpType">
 						<u-icon name="chat" size="20"></u-icon>
-						<text>{{this.comment.children.length}}</text>
+						<!-- <text>{{this.comment.children.length}}</text> -->
 					</view>
 					<view class="icon icon2" @click="likeComment()">
 						<u-icon :name="like" :color="likeColor" size="20"></u-icon>
@@ -76,20 +76,22 @@
 				type: Number,
 				default: 0
 			},
-			commentList: {
+			commentlist: {
 				type: Object,
 				default: () => {}
 			}
 		},
 		created() {
 			this.userInfo = JSON.parse(uni.getStorageSync('userInfo'))
-			if(this.userInfo.likeComment.indexOf(this.commentList.id.toString()) !== -1){
+			if(this.userInfo.likeComment.indexOf(this.commentlist.id.toString()) !== -1){
 				this.likeColor = 'red'
 				this.like = 'thumb-up-fill'
 			}else {
 				this.like = 'thumb-up'
 			}
-			this.comment = this.commentList
+			this.$nextTick(()=>{
+				this.comment = this.commentlist
+			})
 		},
 		data() {
 			return {
@@ -102,8 +104,12 @@
 			};
 		},
 		watch:{
-			commentList(val){
-				this.comment = JSON.parse(JSON.stringify(val))
+			commentlist:{
+				handler(val){
+					this.comment = JSON.parse(JSON.stringify(val))
+				},
+				immediate:true,
+				deep:true
 			}
 		},
 		filters:{

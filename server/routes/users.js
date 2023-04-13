@@ -31,4 +31,16 @@ router.post('/getHistoryChat',function(req,res,next){
   let obj = req.body.params
   sqlApi.getHistoryChat(res,obj)
 })
+
+//获取搜索记录
+router.post('/addSearchHistory',function(req,res,next){
+  let obj = req.body.params.obj
+  sqlApi.addSearchHistory(res,obj)
+})
+//聊天记录置为已读
+router.post('/toRead',function(req,res,next){
+  let obj = req.body.params.obj
+  console.log(obj);
+  // sqlApi.toRead(res,obj)
+})
 module.exports = router;

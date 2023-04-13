@@ -6,12 +6,30 @@
         <div class="form-title">
           <p>失物招领管理平台</p>
         </div>
-        <el-form ref="loginForm" :model="form" label-width="0px" class="login-form">
+        <el-form
+          ref="loginForm"
+          :rules="rules"
+          :model="form"
+          label-width="0px"
+          class="login-form"
+        >
           <el-form-item prop="username">
-            <el-input type="text" v-model="form.username" auto-complete="off" placeholder="请输入管理员账号" prefix-icon="el-icon-user" />
+            <el-input
+              type="text"
+              v-model="form.username"
+              auto-complete="off"
+              placeholder="请输入管理员账号"
+              prefix-icon="el-icon-user"
+            />
           </el-form-item>
           <el-form-item prop="password">
-            <el-input v-model="form.password" type="password" auto-complete="off" placeholder="请输入管理员密码" prefix-icon="el-icon-lock" />
+            <el-input
+              v-model="form.password"
+              type="password"
+              auto-complete="off"
+              placeholder="请输入管理员密码"
+              prefix-icon="el-icon-lock"
+            />
           </el-form-item>
           <!-- <el-form-item prop="code">
             <div class="clear-fix">
@@ -22,14 +40,21 @@
             </div>
           </el-form-item> -->
           <el-form-item>
-            <el-button size="small" type="primary" style="width:100%;" @click="toLogin">
+            <el-button
+              size="small"
+              type="primary"
+              style="width: 100%"
+              @click="toLogin"
+            >
               <span v-if="!loading">立即登录</span>
               <span v-else>登 录 中...</span>
             </el-button>
-            <el-checkbox style="float:right;">记住密码</el-checkbox>
+            <el-checkbox style="float: right">记住密码</el-checkbox>
           </el-form-item>
         </el-form>
-        <p class="login-tip">推荐使用最新的谷歌或火狐浏览器（IE升级到IE9以上）</p>
+        <p class="login-tip">
+          推荐使用最新的谷歌或火狐浏览器（IE升级到IE9以上）
+        </p>
       </div>
     </div>
   </div>
@@ -37,29 +62,49 @@
 
 <script>
 export default {
-  name: 'login',
+  name: "login",
   data() {
     return {
-      loading:false,
-      form:{
-        username:'',
-        password:''
-      }
-    }
+      loading: false,
+      form: {
+        username: "admin",
+        password: "123",
+      },
+      rules: {
+        username: [
+          {
+            required: true,
+            message: "请输入账号",
+            trigger: "blur"
+          }
+        ],
+        password: [
+          {
+            required: true,
+            message: "请输入密码",
+            trigger: "blur"
+          }
+        ],
+      },
+    };
   },
-  methods:{
-    toLogin(){
-      this.loading = !this.loading
-      this.$router.push({name:'home'})
-      this.$message({
-          message: '登录成功',
-          type: 'success'
-        });
-      this.loading = !this.loading
-      
-    }
-  }
-}
+  methods: {
+    toLogin() {
+      this.loading = !this.loading;
+      this.$refs.loginForm.validate((valid) => {
+        if (valid) {
+          this.$router.push({ name: "home" });
+          this.$message({
+            message: "登录成功",
+            type: "success",
+          });
+        }
+      });
+
+      this.loading = !this.loading;
+    },
+  },
+};
 </script>
 
 <style lang="less">
@@ -98,7 +143,7 @@ export default {
         margin-bottom: 32px;
         line-height: 40px;
         text-align: center;
-        color: #29304E;
+        color: #29304e;
         font-size: 28px;
         font-family: MicrosoftYaHei;
         text-shadow: 0 4px 20px rgba(5, 22, 47, 0.07);
@@ -124,7 +169,7 @@ export default {
         height: 40px;
         line-height: 40px;
         border-radius: 2px;
-        border: 1px solid #DCDFE6;
+        border: 1px solid #dcdfe6;
       }
       .el-button--small {
         height: 40px;

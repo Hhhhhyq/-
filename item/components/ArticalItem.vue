@@ -48,12 +48,14 @@
 				default:()=>{}
 			}
 		},
-		created(){
-			this.userInfo = JSON.parse(uni.getStorageSync('userInfo'))
+		onLoad(){
 			if(this.userInfo.likes.indexOf(this.listData.id.toString()) != -1){
 				this.like = 'thumb-up-fill'
 				this.likeColor = 'red'
 			}
+		},
+		created() {
+			this.userInfo = JSON.parse(uni.getStorageSync('userInfo'))
 		},
 		data() {
 			return {

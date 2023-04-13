@@ -54,8 +54,8 @@
 					<text class="title-l">物品首推</text>
 					<view class="title-r" @click="toAll"><text>查看更多</text><u-icon name="arrow-right-double" color="#56bbb5"></u-icon></view>
 				</view>
-					<urgent-search></urgent-search>
-				<u-divider text="没有更多了"></u-divider>
+				<urgent-search></urgent-search>
+				<u-divider v-if="noMore" text="没有更多了"></u-divider>
 			</view>
 		</template>
 		<template v-if="searchStatus">
@@ -78,17 +78,14 @@
 		},
 		data() {
 			return {
+				noMore:false,
 				searchStatus: false,
 				title: 'Hello',
 				show: false,
 				value1: Number(new Date()),
 				windowHeight: '',
 				city: '天津',
-				list1: [
-					'https://cdn.uviewui.com/uview/swiper/swiper1.png',
-					'https://cdn.uviewui.com/uview/swiper/swiper2.png',
-					'https://cdn.uviewui.com/uview/swiper/swiper3.png',
-				],
+				list1: [],
 				noticeList: [
 					'当前所在滑块的 item-id ，不能与 current 被同时指定',
 					'是否采用衔接滑动，即播放到末尾后重新回到开头',
@@ -99,13 +96,29 @@
 		},
 		onLoad() {},
 		computed: {},
-		mounted() {
-
-		},
 		created() {
 			this.getSysteminfo()
+			this.initBanner()
+		},
+		onReachBottom() {
+			this.noMore = true
 		},
 		methods: {
+			//获取轮播图片
+			async initBanner(){
+				const res = await this.$api.getAllType()
+				if(res.status == 200){
+					let arr = res.data.bannerlist.split(',')
+					let arr1 = []
+					arr.forEach(item=>{
+						if(item == ''){
+							return ;
+						}
+						arr1.push(item)
+					})
+					this.list1 = arr1
+				}
+			},
 			toAll(){
 				uni.navigateTo({
 					url:'/pages/allGoods/allGoods'
@@ -392,7 +405,7 @@
 		}
 
 		.home-bottom {
-			padding: 30rpx 30rpx 100rpx 30rpx;
+			padding: 30rpx 30rpx 40rpx 30rpx;
 			box-sizing: border-box;
 			.home-bottom-title{
 				display: flex;

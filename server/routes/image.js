@@ -128,4 +128,29 @@ router.post("/articalUpload", multer({
         console.log(e)
     }
 })
+router.post("/uploadBanner", multer({
+    dest: "./public/upload/banner"
+}).single("file"), (req, res) => {
+    // var url = "http://192.168.196.127:3000/";
+    var url = "http://192.168.100.13:3000/";
+    // var url = "http://192.168.3.129:3000/"
+    var file = req.file;
+    var time = Date.now();
+    try {
+        var name=file.originalname.split('.')
+        name = "."+name[name.length - 1];
+        fs.renameSync(file.path, `./public/upload/banner/${time+name}`)
+        file.path = url + `upload/banner/${time+name}`;
+        console.log(file.path);
+        res.json({
+			"status":200,
+			"message":"success",
+			"data":{"url":file.path}}
+		);
+        // res.sendStatus(200)
+    } catch (e) {
+        res.send(e)
+        console.log(e)
+    }
+})
 module.exports = router;

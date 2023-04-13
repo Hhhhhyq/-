@@ -34,94 +34,20 @@
 						</view>
 					</view>
 				</view>
-				<view class="comment" v-if=" this.commentList && this.commentList.length">
+				<view class="comment" v-if="this.commentList && this.commentList.length">
 					<view class="all-count">
 						<view class="all-txt">全部评论</view>
 						<view class="all-num" v-if="this.commentNum && this.commentNum!==0">({{this.commentNum}}条)</view>
 					</view>
-					<comment-item :articalId="id" :commentList="item" v-for="(item,index) in commentList" :key="index"></comment-item>
-					<!-- <view class="comment-item" v-for="(item,index) in commentList">
-						<view class="userInfo">
-							<u--image :showLoading="true" :src="item.publisherImg" width="30px" height="30px" shape="circle">
-								</u--image>
-							<view class="info-r">
-								<view class="name">
-									{{item.publisherName}}
-								</view>
-								<view class="time">
-									<view class="time-r">
-										{{item.publisherCollege}}
-									</view>
-								</view>
-							</view>
-						</view>
-						<view class="content-box">
-							<view class="content-txt">{{item.content}}</view>
-							<view class="bottom">
-								<view class="time">
-									<view class="time-l">
-										{{item.time | dealTime}}
-									</view>
-									<view class="time-r">
-										{{item.publisherCollege}}
-									</view>
-								</view>
-								<view class="bot-icons">
-									<view class="icon icon1" @click="changeInpType">
-										<u-icon name="chat" size="20"></u-icon>
-										<text>{{item.children.length}}</text>
-									</view>
-									<view class="icon icon2">
-										<u-icon :name="like" :color="likeColor" size="20" @click="likeComment(item)"></u-icon>
-										<text>{{item.likes}}</text>
-									</view>
-								</view>
-							</view>
-							<view class="sub-content" v-if="item.children && item.children.length">
-								<template v-if="item.children.length <= 3">
-									<view class="sub-content-item" v-for="(subitem,index) in item.children" :key="index">
-										{{subitem.publishername}}回复: {{subitem.content}}
-									</view>
-								</template>
-								<template v-else>
-									<view v-if="!showmore">
-										<view class="sub-content-item">
-											{{item.children[0].publishername}}回复: {{item.children[0].content}}
-										</view>
-										<view class="sub-content-item">
-											{{item.children[1].publishername}}回复: {{item.children[1].content}}
-										</view>
-										<view class="sub-content-item">
-											{{item.children[2].publishername}}回复: {{item.children[2].content}}
-										</view>
-									</view>
-									<view v-else>
-										<view class="sub-content-item" v-for="(subitem,index) in item.children" :key="index">
-											{{subitem.publishername}}回复: {{subitem.content}}
-										</view>
-									</view>
-									<view class="show-more" v-if="!showmore"
-										@click="showMore">展开{{item.children.length - 3}}条回复</view>
-									<view class="show-more" v-if="showmore"
-											@click="up">收起回复</view>
-								</template>
-							</view>
-						</view>
-					</view> -->
+					<view  v-for="(item,index) in this.commentList" :key="index">
+						<comment-item :articalId="id" :commentlist="item"></comment-item>
+					</view>
 				</view>
 				<view v-else></view>
 			</scroll-view>
 		</view>
 		<view  class="edit" :style="{bottom: bottom}">
 			<view class="inp">
-				<!-- <u--input
-					
-				    placeholder="请输入内容"
-				    border="surround"
-					 @focus="focus" 
-					 @blur="blur"
-				    v-model="inpValue"
-				  ></u--input> -->
 			 	<input class="uni-input"  @focus="focus" @blur="blur" :adjust-position="false" type="text" placeholder="请输入内容" @input="handleInput" :value="inpValue" />
 			 </view>
 			 <view class="send" @click="sendTxt">发送</view>
@@ -159,6 +85,7 @@
 			this.id = Number(articalInfo.id)
 			this.articalInfo = articalInfo
 			this.getComment(this.id)
+			
 		},
 		created() {
 			this.userInfo = JSON.parse(uni.getStorageSync('userInfo'))
@@ -230,7 +157,7 @@
 				}else {
 					console.log('回复');
 				}
-				// this.inpValue = ''
+				this.inpValue = ''
 			},
 			
 			// 获得焦点后

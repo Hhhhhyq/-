@@ -19,7 +19,7 @@
 			<view class="item-bot">
 				<view class="item-bot-l">
 					<view class="item-bot-img">
-						<image src="../static/image/iPhone.jpeg" alt="">
+						<img class="img" :src="dataInfo.publisherimg" alt="">
 					</view>
 					<text class="item-bot-name">{{dataInfo.publishername}}</text>
 				</view>
@@ -94,7 +94,7 @@
 		padding: 14rpx;
 		border-radius: 24rpx;
 		margin-bottom: 30rpx;
-
+		
 		.img {
 			width: 240rpx;
 			height: 240rpx;
@@ -168,11 +168,13 @@
 					height: 40rpx;
 					border-radius: 50%;
 					border: 1px solid #666;
-					padding: 6rpx;
 					box-sizing: border-box;
 					overflow: hidden;
 					margin-right: 10rpx;
-				
+					.img{
+						width: 40rpx;
+						height: 40rpx;
+					}
 					image {
 						width: 100%;
 						height: 100%;

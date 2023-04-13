@@ -9,7 +9,7 @@
                     <common-header />
                 </el-header>
                 <!-- <common-tag /> -->
-                <el-main style="width:100%;height:calc(100vh - 60px);padding:20px 20px 0 20px;overflow:overlay;">
+                <el-main style="background-color:rgb(247, 248, 249);width:100%;height:calc(100vh - 60px);padding:20px 20px 0 20px;overflow:overlay;">
                   <transition name="fade" mode="out-in">
                     <router-view></router-view>
                   </transition>

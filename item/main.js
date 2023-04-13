@@ -10,8 +10,8 @@ Vue.prototype.$api = api
 
 //引入双工通信文件
 import io from  './common/js/weapp.socket.io.js'
+// Vue.prototype.socket =io('ws://10.20.187.192:8888');
 Vue.prototype.socket =io('ws://192.168.100.13:8888');
-
 
 // 引入uview
 import uView from '@/uni_modules/uview-ui'

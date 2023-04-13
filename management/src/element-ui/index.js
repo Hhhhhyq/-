@@ -29,7 +29,11 @@ import {
   Dialog,
   Descriptions,
   DescriptionsItem,
-  Card
+  Card,
+  Tabs,
+  TabPane,
+  MessageBox,
+  Upload
 } from "element-ui";
 Vue.use(Button);
 Vue.use(Select);
@@ -59,7 +63,15 @@ Vue.use(Dialog);
 Vue.use(Descriptions);
 Vue.use(DescriptionsItem);
 Vue.use(Card);
+Vue.use(Tabs);
+Vue.use(TabPane);
+Vue.use(Upload);
 
-
+//引入嵌入式过渡动画
+import 'element-ui/lib/theme-chalk/base.css';
+// collapse 展开折叠
+import CollapseTransition from 'element-ui/lib/transitions/collapse-transition';
+Vue.component(CollapseTransition.name, CollapseTransition)
 
 Vue.prototype.$message = Message;
+Vue.prototype.$confirm = MessageBox.confirm

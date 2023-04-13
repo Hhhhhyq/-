@@ -19,8 +19,11 @@
 				<view class="icon iconfont icon-shanchu" @click="deleteAll"></view>
 			</view>
 			<view class="list">
-				<u-tag v-for="(item,index) in searchList" plain color="#666" borderColor="#999" :text=item closable
-					@close="deleteItem(index)"></u-tag>
+				<span v-for="(item,index) in searchList" :key="index">
+					<u-tag v-if="item !== ''" plain color="#666" borderColor="#999" :text=item closable
+						@close="deleteItem(index)"></u-tag>
+				</span>
+				
 			</view>
 		</view>
 	</view>
@@ -30,24 +33,26 @@
 	export default {
 		data() {
 			return {
-				searchList: [
-					'手机',
-					'书包',
-					'耳机',
-					'历史搜索记录',
-					'历史搜索记录'
-				],
+				userInfo:{},
+				searchList: [],
 				inputValue: '',
 				isInputFocus: false //进入界面输入框是否聚焦
 			}
 		},
 		created() {
 			this.getSysteminfo()
+			this.userInfo = JSON.parse(uni.getStorageSync('userInfo'))
+			this.searchList = this.userInfo.searchlist
 		},
 		mounted() {
 			this.isInputFocus = true
 		},
 		methods: {
+			//添加搜索记录
+			async addHistory(){
+				let search = this.searchList.toString()
+				const res = await this.$api.addSearchHistory({id:this.userInfo.id,value:search})
+			},
 			// 获取系统栏高度
 			getSysteminfo() {
 				uni.getSystemInfo({
@@ -57,17 +62,38 @@
 				});
 			},
 			deleteItem(index) {
-				console.log(index);
 				this.searchList.splice(index, 1)
+				this.addHistory()
+				this.userInfo.searchlist = this.searchList
+				uni.setStorage({
+					key: 'userInfo',
+					data: JSON.stringify(this.userInfo)
+				})
 			},
 			deleteAll() {
 				this.searchList = []
+				this.addHistory()
+				this.userInfo.searchlist = this.searchList
+				uni.setStorage({
+					key: 'userInfo',
+					data: JSON.stringify(this.userInfo)
+				})
 			},
 			search() {
 				if (this.inputValue.trim() == '') {
 					return;
 				}
+				this.inputValue.trim()
 				this.searchList.push(this.inputValue)
+				this.addHistory(this.inputValue)
+				this.userInfo.searchlist = this.searchList
+				uni.setStorage({
+					key: 'userInfo',
+					data: JSON.stringify(this.userInfo)
+				})
+				uni.navigateTo({
+					url:'/pages/allGoods/allGoods?search='+this.inputValue
+				})
 			},
 			backHome() {
 				this.$emit('blurs')

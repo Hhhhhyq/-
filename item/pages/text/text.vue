@@ -7,17 +7,23 @@
 		</u-navbar>
 		<scroll-view scroll-y="true" >
 			<view class="list-item" v-for="(item,index) in itemArr" :key="index" @click="toChat(item)">
-				<image :src="item.img" mode="">
+				<view style="position: relative;display: flex;margin-right: 20rpx;">
+					<image :src="item.img" mode="" style="margin: auto;">
+					<view class="noread" v-if="item.noreadNum && item.noreadNum !== 0">
+						<view class="num">
+							{{item.noreadNum}}
+						</view>
+					</view>
+				</view>
 				<view class="item-r">
 					<view class="content">
 						<view class="content-l">{{item.name}}</view>
-						<view class="conetent-r">{{item.list.sendtime | dealTime}}</view>
+						<view class="conetent-r">{{item.list[item.length-1].sendtime | dealTime}}</view>
 					</view>
-					<view class="name">{{item.list.content}}</view>
+					<view class="name">{{item.list[item.length-1].content}}</view>
 				</view>
 			</view>
 		</scroll-view>
-		
 	</view>
 </template>
 
@@ -26,7 +32,9 @@
 		data() {
 			return {
 				indexList: [],
-				itemArr: {}
+				itemArr: [],
+				time:0,
+				timer:null
 			}
 		},
 		onLoad() {
@@ -36,6 +44,15 @@
 			if(token){
 				this.init()
 			}
+			this.timer = setInterval(()=>{
+				if(this.time >=60){
+					this.init()
+					this.time = 0
+				}
+				this.time++
+				
+			},1000)
+			this.$once('hook:beforeDestroy',()=> this.timer = null)
 		},
 		filters:{
 			dealTime(val){
@@ -47,17 +64,27 @@
 			async init(){
 				console.log(uni.getStorageSync('userInfo'));
 				let id = JSON.parse(uni.getStorageSync('userInfo')).id
-				console.log(id);
 				let res = await this.$api.charList(id)
+				console.log(res);
 				if(res.status == 200){
+					let arr = []
 					for(let item in res.data){
 						res.data[item].id = Number(item)
+						res.data[item].length = res.data[item].list.length
+						arr.push(res.data[item])
+						let noreadNum = 0
+						res.data[item].list.forEach((item)=>{
+							if(item.isread ==0){
+								noreadNum++
+							}
+						})
+						res.data[item].noreadNum = noreadNum
 					}
-					this.itemArr = res.data
+					console.log(arr);
+					this.itemArr = arr
 				}
 			},
 			toChat(item) {
-				// console.log(item);
 				uni.navigateTo({
 					url:`/pages/chatPage/chatPage?to=${item.name}&toId=${item.id}`
 				})
@@ -112,6 +139,25 @@
 						font-size: 20rpx;
 						color: #666666;
 					}
+				}
+			}
+			.noread{
+				position: absolute;
+				width: 30rpx;
+				height: 30rpx;
+				background-color: red;
+				right: -16rpx;
+				border-radius: 50%;
+				top: -12rpx;
+				display: flex;
+				.num{
+					// position: absolute;
+					text-align: center;
+					line-height: 30rpx;
+					width: 30rpx;
+					height: 30rpx;
+					// margin: auto;
+					font-size: 18rpx;
 				}
 			}
 		}

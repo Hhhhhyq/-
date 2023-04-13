@@ -114,11 +114,19 @@
 		methods: {
 			async init() {
 				const res = await this.$api.getHistoryChat(this.myInfo.id, this.toId)
-				console.log(res);
 				if (res.status == 200) {
 					this.chatList = res.data.list
 					this.toImg = res.data.img
 				}
+				this.toRead()
+				
+			},
+			toRead(){
+				this.chatList.forEach(async item=>{
+					if(item.isread == 0){
+						const res = await this.$api.toRead(item)
+					}
+				})
 			},
 			// 用户登录socket注册
 			join(uid) {
@@ -142,15 +150,18 @@
 				if (this.value.trim() !== '') {
 					let data = {
 						id: this.myInfo.id,
-						toId: this.toId,
+						toId: Number(this.toId),
 						value: this.value
 					}
 					console.log('1', this.toId);
 					this.socket.emit('msg', this.value, this.myInfo.id, this.toId);
-					this.chatList.push({
-						id: this.myInfo.id,
-						value: this.value
-					})
+					let obj = {
+						reciveid: Number(this.toId),
+						content: this.value,
+						sendid:this.myInfo.id
+					}
+					this.chatList.push(obj)
+					console.log(this.chatList);
 					this.value = ''
 				}
 			},

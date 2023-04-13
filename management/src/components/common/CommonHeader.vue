@@ -13,8 +13,8 @@
             <img class="user" src="../../assets/user.png" alt="" />
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>个人中心</el-dropdown-item>
-            <el-dropdown-item command="cancel">退出</el-dropdown-item>
+            <el-dropdown-item @click="toMyself">个人中心</el-dropdown-item>
+            <el-dropdown-item command="cancel" @click="exit">退出</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
@@ -43,6 +43,14 @@ export default {
         this.$router.push("/login");
       }
     },
+    //个人中心
+    toMyself(){
+      
+    },
+    //退出登录
+    exit(){
+
+    }
   },
 };
 </script>

@@ -67,4 +67,17 @@ api.saw = (obj)=>http.post('/api/artical/saw',{params:{id:obj.id,saw:obj.saw}})
 api.commentThumbsUp = (obj)=>http.post('/api/artical/commentThumbsUp',{params:{obj:obj}})
 // 发表评论
 api.sendComment = (obj)=>http.post('/api/artical/sendComment',{params:{obj:obj}})
+//获取搜索记录
+api.addSearchHistory = (obj)=>http.post('/api/users/addSearchHistory',{params:{obj:obj}})
+api.getUrgentList = ()=>http.get('/api/goods/getUrgentList')
+//h获取更多物品信息
+api.getMore = (obj)=>http.post('/api/goods/getMore',{params:{obj:obj}})
+//聊天记录置为1，已读
+api.toRead = (obj)=>http.post('/api/users/toRead',{params:{obj:obj}})
+//个人删除物品
+api.deleteMyGood = (obj)=>http.post('/api/goods/deleteMyGood',{params:{obj:obj}})
+//归还
+api.returnGoods = (obj)=>http.post('/api/goods/returnGoods',{params:{obj:obj}})
+//获取所有类型
+api.getAllType = ()=>http.get('/api/goods/getAllType')
 export default api

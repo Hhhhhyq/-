@@ -3,12 +3,12 @@
 		<u-navbar title="个人中心" placeholder leftIcon='' :titleStyle="{
 					fontSize: '30rpx',
 					fontWeight:'bold'
-				}" bgColor="#56bbb5">
+				}" bgColor="#56bbb5" :customStyle='customStyle'>
 		</u-navbar>
 		<view class="my-head">
 			<view class="my-head-box">
 				<view class="my-img">
-					<u-icon v-if="this.userInfo.img === null" class="none-img" name="camera-fill" size="40"></u-icon>
+					<u-icon v-if="this.userInfo.img === undefined || this.userInfo.img === ''" class="none-img" name="camera-fill" size="40"></u-icon>
 					<image v-else :src="userInfo.img" mode="">
 				</view>
 				<view class="my-name" @click="tologin">{{this.userInfo.name ? this.userInfo.name : '立即登录'}}</view>
@@ -35,9 +35,9 @@
 			</view>
 		</view>
 		<view class="my-release">
-			<u-collapse accordion :border="false">
+			<u-collapse accordion :border="false"style="{height: 100%;}">
 				<u-collapse-item name="release" title="我发布的物品">
-					<goods-list v-if="releaseGoodsList.length" :goodsList="releaseGoodsList"></goods-list>
+					<goods-list v-if="releaseGoodsList.length" type="release" :goodsList="releaseGoodsList" @getRelease="getMyRelease"></goods-list>
 					<view class="no-goods" v-else>
 						<u-empty mode="list" icon="http://cdn.uviewui.com/uview/empty/car.png">
 						</u-empty>
@@ -45,7 +45,7 @@
 				</u-collapse-item>
 				<u-collapse-item name="find" title="我丢失的物品">
 					<view class="u-collapse-content">
-						<goods-list v-if="findGoodsList.length" :goodsList="findGoodsList"></goods-list>
+						<goods-list v-if="findGoodsList.length" type="find" :goodsList="findGoodsList" @getFind="getMyFind"></goods-list>
 						<view class="no-goods" v-else>
 							<u-empty mode="list" icon="http://cdn.uviewui.com/uview/empty/car.png">
 							</u-empty>
@@ -81,10 +81,10 @@
 		components: {
 			GoodsList
 		},
-		onShow(){
-			console.log();
-			this.userInfo = JSON.parse(uni.getStorageSync('userInfo'))
-		},
+		// onShow(){
+		// 	console.log();
+		// 	this.userInfo = JSON.parse(uni.getStorageSync('userInfo'))
+		// },
 		data() {
 			return {
 				userInfo: {},
@@ -110,25 +110,25 @@
 					borderRadius:'50%',
 					padding:'8rpx 4rpx',
 					boxSizing:'border-box'
-				},
-				customStyle:{
-					fontWeight:'bold'
 				}
+				// customStyle:{
+				// 	fontWeight:'bold'
+				// }
 			}
 		},
 		created() {
 			this.token = uni.getStorageSync('token')
-			let data = uni.getStorageSync('userInfo')
-
-			let userInfo = JSON.parse(uni.getStorageSync('userInfo'))
-			console.log(userInfo);
-			if (userInfo.name && userInfo.name !== '') {
-				this.userInfo = userInfo
-				this.getMyRelease(this.userInfo.id)
-				this.getMyFind(this.userInfo.id)
+			// let data = uni.getStorageSync('userInfo')
+			if(this.token){
+				let userInfo = JSON.parse(uni.getStorageSync('userInfo'))
+				console.log(userInfo);
+				if (userInfo.name && userInfo.name !== '') {
+					this.userInfo = userInfo
+					this.getMyRelease(this.userInfo.id)
+					this.getMyFind(this.userInfo.id)
+				}
+				// console.log(this, userInfo);
 			}
-			console.log(this, userInfo);
-
 		},
 		methods: {
 			editInfo() {
@@ -176,6 +176,8 @@
 				this.token = ''
 				this.userInfo = {}
 				this.goodsList = []
+				this.releaseGoodsList = []
+				this.findGoodsList = []
 				uni.removeStorageSync('token')
 				uni.removeStorageSync('userInfo')
 				this.$refs.uToast.show({
@@ -187,6 +189,7 @@
 			},
 			// 获取发布物品信息
 			async getMyRelease(id) {
+				console.log(111);
 				let result = await this.$api.getMyRelease(id)
 				if (result.status == 200) {
 					this.releaseGoodsList = result.releaseGoods

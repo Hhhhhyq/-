@@ -69,7 +69,7 @@
 				}
 			}
 		},
-		created(){
+		created() {
 			// if(this.$route.query !== undefined){
 			// 	this.formData.email = this.$route.query.email
 			// }
@@ -87,38 +87,54 @@
 			},
 			submit() {
 				this.$refs.form.validate().then(async res => {
-					let result = await this.$api.login(this.formData)
-					console.log(result)
-					if (result.data.token) {
-						uni.setStorage({
-							key: 'token',
-							data: result.data.token
-							// data:'11212'
-						})
-						result.data.userInfo.likes = result.data.userInfo.likes.split(',')
-						result.data.userInfo.likeComment = result.data.userInfo.likeComment.split(',')
-						uni.setStorage({
-							key: 'userInfo',
-							data: JSON.stringify(result.data.userInfo)
-						})
-						// this.socket.emit('join',result.data.userInfo.id)
-						this.$refs.uToast.show({
-							type: 'success',
-							message: "登录成功",
-							iconUrl: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
-							duration: '1500',
-							complete() {
-								uni.switchTab({
-									url: '/pages/home/home'
-								})
+					console.log(res);
+					if (res) {
+						let result = await this.$api.login(this.formData)
+						console.log(result.data.token)
+						if (result.data.token !== '') {
+							uni.setStorage({
+								key: 'token',
+								data: result.data.token
+							})
+							if(result.data.userInfo.likes == null){
+								result.data.userInfo.likes = []
+							}else {
+								result.data.userInfo.likes = result.data.userInfo.likes.split(',')
 							}
-						})
-					} else {
-						this.$refs.uToast.show({
-							type: 'error',
-							message: "登录失败",
-							iconUrl: 'https://cdn.uviewui.com/uview/demo/toast/error.png'
-						})
+							if(result.data.userInfo.likes == null){
+								result.data.userInfo.likeComment = []
+							}
+							else {
+								result.data.userInfo.likeComment = result.data.userInfo.likeComment.split(',')
+							}
+							if(result.data.userInfo.likes == null){
+								result.data.userInfo.searchlist = []
+							}
+							else {
+								result.data.userInfo.searchlist = result.data.userInfo.searchlist.split(',')
+							}
+							uni.setStorage({
+								key: 'userInfo',
+								data: JSON.stringify(result.data.userInfo)
+							})
+							this.$refs.uToast.show({
+								type: 'success',
+								message: "登录成功",
+								iconUrl: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
+								duration: '1500',
+								complete() {
+									uni.switchTab({
+										url: '/pages/home/home'
+									})
+								}
+							})
+						} else {
+							this.$refs.uToast.show({
+								type: 'error',
+								message: "登录失败",
+								iconUrl: 'https://cdn.uviewui.com/uview/demo/toast/error.png'
+							})
+						}
 					}
 				}).catch(errors => {
 					this.$refs.uToast.show({
@@ -155,6 +171,7 @@
 			height: 420rpx;
 			border-radius: 0 0 10rpx 10rpx;
 			box-sizing: border-box;
+
 			image {
 				width: 100%;
 				height: 100%;

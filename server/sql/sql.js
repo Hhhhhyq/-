@@ -22,7 +22,7 @@ sqlApi.register = (req, res) => {
         let paramsArr = [req.email, req.password, req.name];
         let callback = (err, data) => {
           if (err) {
-            console.log("222");
+            console.log(err);
           } else {
             console.log("插入成功");
             res.send({
@@ -71,11 +71,12 @@ sqlApi.login = (req, res) => {
 sqlApi.release = (req, res) => {
   console.log(req);
   let sqlStr =
-    "INSERT INTO releasegoods(type,publisher,publishername,title,selectType,address,longitude,latitude,remarks,location,remarkContactMe,pickInfo,collection,status,time) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    "INSERT INTO releasegoods(type,publisher,publishername,publisherimg,title,selectType,address,longitude,latitude,remarks,location,remarkContactMe,pickInfo,collection,status,time) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
   let paramsArr = [
     req.type,
     req.publisher,
     req.publishername,
+    req.publisherimg,
     req.title,
     req.selectType,
     req.address,
@@ -209,12 +210,13 @@ sqlApi.getAllRelease = (res) => {
 //发布用户丢失物品
 sqlApi.find = (req, res) => {
   let sqlStr =
-    "INSERT INTO findgoods(type,title,publisher,publishername,name,phone,college,intro,selectType,address,longitude,latitude,description,status,time) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    "INSERT INTO findgoods(type,title,publisher,publishername,publisherimg,name,phone,college,intro,selectType,address,longitude,latitude,description,status,time) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
   let paramsArr = [
     req.type,
     req.title,
     req.publisher,
     req.publishername,
+    req.publisherimg,
     req.name,
     req.phone,
     req.college,
@@ -336,19 +338,6 @@ sqlApi.getAllFind = (res) => {
                 data: result,
               });
             }
-            // data1 = JSON.parse(JSON.stringify(data1))
-            // if(data1.length == 0){
-            //     result[i].goodsList = []
-            // }else {
-            //     result[i].goodsList = data1
-            // }
-            // if(i>=result.length-1){
-            //     res.send({
-            //         status: 200,
-            //         message:'success',
-            //         data:result
-            //     })
-            // }
           }
         });
       }
@@ -360,8 +349,8 @@ sqlApi.getAllFind = (res) => {
 //存储双方聊天记录
 sqlApi.chatRecord = (data) => {
   let sqlStr =
-    "INSERT INTO chatlist(content,reciveid,sendid,sendtime) VALUES(?,?,?,?)";
-  let paramsArr = [data.content, data.reciveid, data.sendid, data.sendtime];
+    "INSERT INTO chatlist(content,reciveid,sendid,sendtime,isread) VALUES(?,?,?,?,?)";
+  let paramsArr = [data.content, data.reciveid, data.sendid, data.sendtime,data.isread];
   let callback = (err, data) => {
     if (err) {
       console.log(err);
@@ -380,6 +369,7 @@ sqlApi.charList = (res, id) => {
       console.log(err);
     } else {
       data = JSON.parse(JSON.stringify(data));
+      // console.log(data);
       let chatList = {};
       // 分离聊天数据
       data.forEach((item, index) => {
@@ -404,6 +394,7 @@ sqlApi.charList = (res, id) => {
           }
         }
       });
+      console.log(chatList);
       //聊天数据排序
       let i = 0;
       for (let item in chatList) {
@@ -417,8 +408,8 @@ sqlApi.charList = (res, id) => {
           } else {
             chatList[item].img = data1[0].img;
             chatList[item].name = data1[0].name;
-            chatList[item].list.sort((a, b) => a.id - b.id);
-            chatList[item].list = chatList[item].list.pop();
+            // chatList[item].list.sort((a, b) => a.id - b.id);
+            // chatList[item].list = chatList[item].list.pop();
             if (i == Object.keys(chatList).length - 1) {
               //返回数据
               res.send({
@@ -644,6 +635,231 @@ sqlApi.selectApi = (res, data) => {
   }
 };
 
+//获取搜索记录
+sqlApi.addSearchHistory = (res,info)=>{
+  console.log(info);
+  let sqlStr = 'UPDATE user set searchlist=? WHERE id=?'
+  let paramsArr = [info.value,info.id]
+  let callback = (err,data)=>{
+    if(err){
+      console.log(err);
+    }else {
+      res.send({
+        status:200,
+        mesage:'添加成功'
+      })
+    }
+  }
+  connection.sqlConnect(sqlStr, paramsArr, callback);
+}
+//紧急寻乌，find列表最后8个数据
+sqlApi.getUrgentList = (res)=>{
+  let sqlStr = 'SELECT * from findgoods where status=? order by id desc limit 8'
+  // let sqlStr = "SELECT * from findgoods where status=?";
+  let sqlStr1 = "SELECT * from findimg where id=?";
+  let paramsArr = ["1"];
+  let callback = (err, data) => {
+    if (err) {
+      console.log(err);
+      res.send({
+        status: 301,
+        message: "获取失败",
+      });
+    } else {
+      let result = JSON.parse(JSON.stringify(data));
+      if (!result.length) {
+        res.send({
+          status: 200,
+          message: "success",
+          data: [],
+        });
+        return;
+      }
+      for (let i = 0; i < result.length; i++) {
+        connection.sqlConnect(sqlStr1, result[i].id, (err1, data1) => {
+          if (err) {
+            console.log(err1);
+          } else {
+            data1 = JSON.parse(JSON.stringify(data1));
+            result[i].goodsList = JSON.parse(JSON.stringify(data1));
+            result[i] = JSON.parse(JSON.stringify(result[i]));
+            if (i >= result.length - 1) {
+              result = JSON.parse(JSON.stringify(result));
+              res.send({
+                status: 200,
+                message: "success",
+                data: result,
+              });
+            }
+          }
+        });
+      }
+    }
+  };
+  connection.sqlConnect(sqlStr, paramsArr, callback);
+}
+//获取更多
+sqlApi.getMore = (res,obj)=>{
+  console.log(obj);
+  let sqlStr = 'SELECT * from findgoods where status=? AND publisher=?' 
+  // let sqlStr = "SELECT * from findgoods where status=?";
+  let sqlStr1 = "SELECT * from findimg where id=?";
+  let paramsArr = ["1",obj.id];
+  let callback = (err, data) => {
+    if (err) {
+      console.log(err);
+      res.send({
+        status: 301,
+        message: "获取失败",
+      });
+    } else {
+      let result = JSON.parse(JSON.stringify(data));
+      if (!result.length) {
+        res.send({
+          status: 200,
+          message: "success",
+          data: [],
+        });
+        return;
+      }
+      for (let i = 0; i < result.length; i++) {
+        connection.sqlConnect(sqlStr1, result[i].id, (err1, data1) => {
+          if (err) {
+            console.log(err1);
+          } else {
+            data1 = JSON.parse(JSON.stringify(data1));
+            result[i].goodsList = JSON.parse(JSON.stringify(data1));
+            result[i] = JSON.parse(JSON.stringify(result[i]));
+            if (i >= result.length - 1) {
+              result = JSON.parse(JSON.stringify(result));
+              res.send({
+                status: 200,
+                message: "success",
+                data: result,
+              });
+            }
+          }
+        });
+      }
+    }
+  };
+  connection.sqlConnect(sqlStr, paramsArr, callback);
+}
 
-
+//聊天记录置为已读
+sqlApi.toRead = (res,obj)=>{
+  let sqlStr = 'UPDATE chatlist set isread=? where id=?'
+  let paramsArr = [1,obj.id]
+  let callback = (err,data)=>{
+    if(err){
+      console.log(err);
+    }else {
+      res.send({
+        status:200,
+        message:'修改成功'
+      })
+    }
+  }
+  connection.sqlConnect(sqlStr, paramsArr, callback);
+}
+//删除个人物品
+sqlApi.deleteMyGood = (res,obj)=>{
+  if(obj.type == 0){
+    let sqlStr = 'DELETE FROM findgoods WHERE id=?;DELETE FROM findimg WHERE id=?'
+    let paramsArr = [obj.id,obj.id]
+    let callback = (err,data)=>{
+      if(err){
+        console.log(err);
+      }else {
+        res.send({
+          status:200,
+          message:'删除成功'
+        })
+      }
+    }
+    connection.sqlConnect(sqlStr, paramsArr, callback);
+  }else {
+    let sqlStr = 'DELETE FROM releasegoods WHERE id=?;DELETE FROM releaseimg WHERE id=?'
+    let paramsArr = [obj.id,obj.id]
+    let callback = (err,data)=>{
+      if(err){
+        console.log(err);
+      }else {
+        res.send({
+          status:200,
+          message:'删除成功'
+        })
+      }
+    }
+    connection.sqlConnect(sqlStr, paramsArr, callback);
+  }
+  
+}
+//归还
+sqlApi.returnGoods = (res,obj)=>{
+  let sqlStr = 'UPDATE releasegoods set status=? where id=?'
+  let paramsArr = ['3',obj.id]
+  let callback = (err,data)=>{
+    if(err){
+      console.log(err);
+    }else {
+      res.send({
+        status:200,
+        message:'归还成功'
+      })
+    }
+  }
+  connection.sqlConnect(sqlStr, paramsArr, callback);
+}
+sqlApi.getAllType = (res)=>{
+  let sqlStr = 'SELECT * FROM common where id=?'
+  let paramsArr = [1]
+  let callback = (err,data)=>{
+    if(err){
+      console.log(err);
+    }else {
+      data = JSON.parse(JSON.stringify(data))
+      console.log('data',data);
+      // //处理选择类型
+			// let arr = data[0].typelist.split(',')
+			// 		let arr1 = []
+			// 		arr.forEach(item=>{
+			// 			if(item == '' || arr1.indexOf(item) !== -1){
+			// 				return ;
+			// 			}else {
+			// 				arr1.push(item)
+			// 			}
+			// 		})
+      //     data[0].typelist = arr1
+      //     //处理学院信息
+      //     let arr2 = data[0].typelist.split(',')
+			// 		let arr3 = []
+			// 		arr2.forEach(item=>{
+			// 			if(item == '' || arr3.indexOf(item) !== -1){
+			// 				return ;
+			// 			}else {
+			// 				arr3.push(item)
+			// 			}
+			// 		})
+      //     data[0].college = arr3
+      //     //处理代收处
+      //     let arr4 = data[0].typelist.split(',')
+			// 		let arr5 = []
+			// 		arr4.forEach(item=>{
+			// 			if(item == '' || arr5.indexOf(item) !== -1){
+			// 				return ;
+			// 			}else {
+			// 				arr5.push(item)
+			// 			}
+			// 		})
+      //     data[0].collectionlist = arr5
+      res.send({
+        status:200,
+        message:'获取成功',
+        data:data[0]
+      })
+    }
+  }
+  connection.sqlConnect(sqlStr, paramsArr, callback);
+}
 module.exports = sqlApi;

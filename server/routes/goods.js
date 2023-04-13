@@ -47,4 +47,25 @@ router.post('/selectList',function(req,res,next){
     sqlApi.selectApi(res,selectValue)
 })
 
+router.get('/getUrgentList',function(req,res,next){
+    sqlApi.getUrgentList(res)
+})
+router.post('/getMore',function(req,res,next){
+    let obj = req.body.params.obj
+    sqlApi.getMore(res,obj)
+})
+//删除个人物品信息
+router.post('/deleteMyGood',function(req,res,next){
+    let obj = req.body.params.obj
+    sqlApi.deleteMyGood(res,obj)
+})
+//归还
+router.post('/returnGoods',function(req,res,next){
+    let obj = req.body.params.obj
+    sqlApi.returnGoods(res,obj)
+})
+//获取所有类型
+router.get('/getAllType',function(req,res,next){
+    sqlApi.getAllType(res)
+})
 module.exports = router;

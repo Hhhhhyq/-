@@ -2,7 +2,8 @@ import axios from "axios";
 
 let service = axios.create({
   // baseURL: "http://10.20.187.192:3000/api", // api的base_url
-  baseURL: "http://192.168.3.129:3000/api", // api的base_url
+  baseURL: "http://192.168.100.13:3000/api", // api的base_url
+  // baseURL: "http://192.168.3.129:3000/api", // api的base_url
   timeout: 5000, // 请求超时时间
 });
 

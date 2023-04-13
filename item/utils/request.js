@@ -4,8 +4,8 @@ import Request from 'luch-request'
 const service = new Request();
 // let baseURL = config.baseURL;
 // let baseURL = 'http://192.168.196.127:3000'
+// let baseURL = 'http://10.20.187.192:3000'
 let baseURL = 'http://192.168.100.13:3000'
-// let baseURL = 'http://192.168.3.129:3000'
 service.setConfig((config)=>{
 	
 	// #ifndef H5

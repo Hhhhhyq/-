@@ -52,27 +52,38 @@
 				loading: true,
 				value: '', //输入框值
 				columns1: ['所有', '失物招领', '寻物启事'],
-				columns2: [
-					'校园卡',
-					'服饰',
-					'证件',
-					'数码',
-					'日用品'
-				],
+				columns2: [],
 				select: {
 					value1: '所有',
 					value2: ''
 				},
-				goodsList: []
+				goodsList: [],
+				userInfo:{},
+				searchList:[]
 			}
 		},
+		onLoad(options){
+			if(options.search !== undefined){
+				setTimeout(()=>{
+						this.value = options.search
+						this.inputSearch()
+				},1000)
+			}
+			
+		},
 		created() {
+			this.userInfo = JSON.parse(uni.getStorageSync('userInfo'))
+			this.searchList = this.userInfo.searchlist
 			this.select = {
 				value1: '所有',
 				value2: ''
 			}
 			this.value = ''
 			this.initData();
+			this.getAllType()
+		},
+		mounted() {
+			this.inputSearch()
 		},
 		watch: {
 			select: {
@@ -84,9 +95,39 @@
 					}
 				},
 				deep: true
+			},
+			value(val){
+				if(val.trim() == '' || val == ''){
+					this.initData()
+				}
+				else {
+					this.inputSearch()
+				}
 			}
 		},
 		methods: {
+			//获取所有类型
+			async getAllType(){
+				const res = await this.$api.getAllType()
+				if(res.status == 200){
+					let arr = []
+					arr = res.data.typelist.split(',')
+					let arr1 = []
+					arr.forEach(item=>{
+						if(item == '' || arr1.indexOf(item) !== -1){
+							return ;
+						}else {
+							arr1.push(item)
+						}
+					})
+					this.columns2 = arr1
+				}
+			},
+			//添加搜索记录
+			async addHistory(){
+				let search = this.searchList.toString()
+				const res = await this.$api.addSearchHistory({id:this.userInfo.id,value:search})
+			},
 			async initData() {
 				this.loading = true
 				let result = []
@@ -161,13 +202,37 @@
 				const res = await this.$api.selectGoods(value)
 				this.goodsList = res.data
 			},
+			//防抖
+			debounce(func,wait){
+				let time = null
+				return function(){
+				    if(timer !== null){
+				      clearTimeout(timer);
+				    }
+				    timer = setTimeout(func.bind(this),wait);
+				  }
+			},
 			//搜索框搜索
 			inputSearch() {
-				console.log(1111);
+				if(this.value == '' || this.value.trim() == ''){
+					return ;
+				}
 				this.loading = true
-				let arr = this.goodsList
-				this.goodsList = arr.filter(item => {
-					return item.title.indexOf(this.value) !== -1
+				// let arr = []
+				this.goodsList = this.goodsList.filter(item => {
+					if(item.title == null || item.title == ''){
+						return ;
+					}else {
+						return item.title.indexOf(this.value) !== -1
+					}
+				})
+				//添加搜索记录
+				this.searchList.push(this.value)
+				this.addHistory()
+				this.userInfo.searchlist = this.searchList
+				uni.setStorage({
+					key: 'userInfo',
+					data: JSON.stringify(this.userInfo)
 				})
 				this.loading = false
 			},

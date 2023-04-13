@@ -106,6 +106,20 @@ export default {
           icon: "el-icon-s-tools",
           path: "/goods",
           title: "物品管理",
+          children: [
+            {
+              index: "5 - 1",
+              icon: "el-icon-s-tools",
+              path: "/goods/findManage",
+              title: "寻物管理",
+            },
+            {
+              index: "5 - 2",
+              icon: "el-icon-s-tools",
+              path: "/goods/releaseManage",
+              title: "失物管理",
+            },
+          ],
         },
         {
           index: "6",

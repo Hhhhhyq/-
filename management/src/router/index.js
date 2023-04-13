@@ -43,9 +43,14 @@ const routes = [
         component: ()=>import ('@/views/approval/LostApproval.vue')
       },
       {
-        path: '/goods',
-        name: 'goods',
-        component: ()=>import ('@/views/goods/Goods.vue')
+        path: '/goods/findManage',
+        name: 'findManage',
+        component: ()=>import ('@/views/goods/FindGoods.vue')
+      },
+      {
+        path: '/goods/releaseManage',
+        name: 'releaseManage',
+        component: ()=>import ('@/views/goods/ReleaseGoods.vue')
       },
       {
         path: '/artical',

@@ -16,42 +16,38 @@
 			</view>
 			<template v-if="current === 0">
 				<view class="find">
-					<u--form labelPosition="left" labelWidth="70" :model="findInfo" ref="form1">
+					<u--form labelPosition="left" labelWidth="70" :rules="rules1" :model="findInfo" ref="form1">
 						<view class="findInfo">
-							<u-form-item required label="标题" prop="findInfo.title" borderBottom ref="item1">
+							<u-form-item required label="标题" prop="title" borderBottom ref="item1">
 								<u--input v-model="findInfo.title" border="none" placeholder="请填写物品标题"></u--input>
 							</u-form-item>
-							<u-form-item required label="姓名" prop="findInfo.name" borderBottom ref="item1">
+							<u-form-item required label="姓名" prop="name" borderBottom ref="item1">
 								<u--input v-model="findInfo.name" border="none" placeholder="请填写姓名"></u--input>
 							</u-form-item>
-							<u-form-item required label="联系方式" prop="findInfo.phone" borderBottom ref="item1">
+							<u-form-item required label="联系方式" prop="phone" borderBottom ref="item1">
 								<u--input v-model="findInfo.phone" border="none" placeholder="请填写联系方式"></u--input>
 							</u-form-item>
-							<u-form-item required label="学院" prop="findInfo.college" borderBottom
+							<u-form-item required label="学院" prop="college" borderBottom
 								@click="showCollege = true; hideKeyboard()" ref="item1">
 								<u--input v-model="findInfo.college" disabled disabledColor="#ffffff"
 									placeholder="请选择学院" border="none"></u--input>
 								<u-icon slot="right" name="arrow-right"></u-icon>
 							</u-form-item>
-							<u-form-item required label="类型" prop="findInfo.selectType" borderBottom
+							<u-form-item required label="类型" prop="selectType" borderBottom
 								@click="showselectType = true; hideKeyboard()" ref="item1">
 								<u--input v-model="findInfo.selectType" disabled disabledColor="#ffffff"
 									placeholder="请选择物品类型" border="none"></u--input>
 								<u-icon slot="right" name="arrow-right"></u-icon>
 							</u-form-item>
-							<u-form-item required label="描述" prop="findInfo.intro" borderBottom ref="item3">
+							<u-form-item required label="描述" prop="intro" borderBottom ref="item3">
 								<u--textarea placeholder="不低于5个字" v-model="findInfo.intro" count autoHeight height="70">
 								</u--textarea>
 							</u-form-item>
-							<u-picker :show="showselectType" :columns="selectType" @confirm="confirmType"
-								@cancel="cancelType" key="1"></u-picker>
-							<u-picker :show="showCollege" :columns="actions" @confirm="confirmCollege"
-								@cancel="cancelCollege" key="2"></u-picker>
 						</view>
 						<view class="lossAddress">
 							<view class="address-top">
 								<u-form-item label="地址" style="width: 100%;" labelWidth="40" required
-									prop="findInfo.address" borderBottom>
+									prop="address" borderBottom>
 									<u--input required v-model="findInfo.address" @focus="getAddress"
 										suffixIcon="map-fill" disabledColor="#ffffff" placeholder="请定位丢失地址"
 										border="none" :suffixIconStyle="suffixIconStyle">
@@ -70,13 +66,17 @@
 							</u--textarea> -->
 						</view>
 						<view class="img">
-							<u-upload class="upload" @afterRead="afterRead1" :sizeType="['compressed']" @delete="deletePic1"
-								multiple width="200rpx" previewImage height="200rpx" :fileList="findInfo.fileList"
-								:maxCount="10">
+							<u-upload class="upload" @afterRead="afterRead1" :sizeType="['compressed']"
+								@delete="deletePic1" multiple width="200rpx" previewImage height="200rpx"
+								:fileList="findInfo.fileList" :maxCount="10">
 							</u-upload>
 						</view>
 						<u-button class="btn" @click="release1">发布</u-button>
 					</u--form>
+					<u-picker :show="showselectType" :columns="selectType" @confirm="confirmType"
+						@cancel="cancelType" key="1"></u-picker>
+					<u-picker :show="showCollege" :columns="actions" @confirm="confirmCollege"
+						@cancel="cancelCollege" key="2"></u-picker>
 				</view>
 			</template>
 			<template v-if="current === 1">
@@ -183,30 +183,15 @@
 					duration: 100
 				},
 				current: 0, //选择当前页
-				typeList: [
-					'校园卡',
-					'服饰',
-					'证件',
-					'数码',
-					'日用品',
-					'其它'
-				],
-				selectType: [
-					[
-						'校园卡',
-						'服饰',
-						'证件',
-						'数码',
-						'日用品',
-						'其它'
-					]
-				] || [],
+				typeList: [],
+				selectType: [] || [],
 				publisher: 0,
 				findInfo: {
-					type:0, //type为0为找,type为1为捡
+					type: 0, //type为0为找,type为1为捡
 					publisher: 0,
-					title:'',
-					publishername:'',
+					title: '',
+					publishername: '',
+					publisherimg: '',
 					name: '',
 					phone: '',
 					college: '',
@@ -216,14 +201,15 @@
 					longitude: 0, //经度
 					latitude: 0, //纬度
 					description: '',
-					fileList:[],
+					fileList: [],
 					status: '0',
 					time: '' // 发布时间
 				},
 				goodsInfo: {
-					type:1, //type为0为找,type为1为捡
+					type: 1, //type为0为找,type为1为捡
 					publisher: 0,
-					publishername:'',
+					publishername: '',
+					publisherimg: '',
 					title: '', //物品标题
 					selectType: '', //物品类型选择
 					address: '', //详细地址
@@ -235,7 +221,7 @@
 					pickInfo: '', //失去地点备注
 					collection: '', //代收处地点信息
 					fileList: [], //图片
-					status: '0', //审核状态 0为待审核，1为审核后
+					status: '0', //审核状态 0为待审核，1为审核后,2为拒绝审核,3为已归还
 					time: '' // 发布时间
 				},
 				locationList: [
@@ -244,32 +230,50 @@
 					'代收处'
 				],
 				//学院列表信息
-				actions: [
-					[
-						'计算机与信息工程学院',
-						'商学院',
-						'软件学院',
-						'音乐学院',
-						'体育学院',
-						'历史与文博学院',
-						'音乐学院',
-						'体育学院',
-						'历史与文博学院'
-					]
-				] || [],
+				actions: [] || [],
 				showCollection: false, //是否展示代收处选择器
 				showCollege: false, //是否展示学院选择器
 				showselectType: false, //是否展示类型选择器
-				collectionList: [
-					[
-						'校南门保卫处',
-						'校西门保卫处',
-						'校北门保卫处',
-						'校东门保卫处',
-					]
-				], //学校代收处
+				collectionList: [], //学校代收处
 				suffixIconStyle: {
 					color: '#56bbb5'
+				},
+				rules1: {
+					title: [{
+						required: true,
+						message: '请输入标题',
+						trigger: ['blur']
+					}],
+					name: [{
+						required: true,
+						message: '请输入姓名',
+						trigger: ['blur']
+					}],
+					phone: [{
+						required: true,
+						message: '请输入联系方式',
+						trigger: ['blur']
+					}],
+					college: [{
+						required: true,
+						message: '请选择学院',
+						trigger: ['blur']
+					}],
+					selectType: [{
+						required: true,
+						message: '请选择物品类型',
+						trigger: ['blur']
+					}],
+					intro: [{
+						required: true,
+						message: '请详细描述物品信息',
+						trigger: ['blur']
+					}],
+					address: [{
+						required: true,
+						message: '请选择物品丢失地址',
+						trigger: ['blur']
+					}]
 				}
 			}
 		},
@@ -281,11 +285,58 @@
 			this.goodsInfo.publisher = userInfo.id
 			this.findInfo.publisher = userInfo.id
 			this.goodsInfo.publishername = userInfo.name
+			this.goodsInfo.publisherimg = userInfo.img
 			this.findInfo.publishername = userInfo.name
+			this.findInfo.publisherimg = userInfo.img
 			this.publisher = userInfo.id
 		},
-		mounted() {},
+		mounted() {
+			this.getAllType()
+		},
 		methods: {
+			//获取所有类型
+			async getAllType(){
+				const res = await this.$api.getAllType()
+				console.log(res);
+				if(res.status == 200 || res.status == 304){
+					let arr = []
+					arr = res.data.typelist.split(',')
+					let arr1 = []
+					arr.forEach(item=>{
+						if(item == '' || arr1.indexOf(item) !== -1){
+							return ;
+						}else {
+							arr1.push(item)
+						}
+					})
+					
+					let arr2 = res.data.college.split(',')
+					let arr3 = []
+					arr2.forEach(item=>{
+						if(item == '' || arr3.indexOf(item) !== -1){
+							return ;
+						}else {
+							arr3.push(item)
+						}
+					})
+					
+					let arr4 = res.data.collectionlist.split(',')
+					let arr5 = []
+					arr4.forEach(item=>{
+						if(item == '' || arr5.indexOf(item) !== -1){
+							return ;
+						}else {
+							arr5.push(item)
+						}
+					})
+					this.typeList = arr1
+					this.selectType.push(JSON.parse(JSON.stringify(arr1)))
+					this.actions.push(JSON.parse(JSON.stringify(arr3)))
+					this.collectionList.push(JSON.parse(JSON.stringify(arr5)))
+					this.$forceUpdate()
+					console.log(this.collectionList[0],this.actions[0],this.selectType[0]);
+				}
+			},
 			//隐藏键盘
 			hideKeyboard() {
 				uni.hideKeyboard()
@@ -338,62 +389,78 @@
 			},
 			//发布
 			async release1() {
-				if(this.findInfo.fileList.length <= 0){
+				if (this.findInfo.fileList.length <= 0) {
 					this.$refs.uToast.show({
 						type: 'error',
 						message: '请拍取至少一张物品图片...',
 						iconUrl: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
 						duration: '1500'
 					})
-					return ;
+					return;
 				}
-				let data = new Date()
-				this.findInfo.time = data.getTime().toString()
-				let result = await this.$api.find(this.findInfo)
-				console.log('result',result);
-				if (result.status === 200) {
-					this.$refs.uToast.show({
-						type: 'success',
-						message: result.message,
-						iconUrl: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
-						duration: '500'
-					})
-				} else {
-					this.$refs.uToast.show({
-						type: 'error',
-						message: result.message,
-						iconUrl: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
-						duration: '500'
-					})
-				}
-				this.findInfo = {
-					type:0, //type为0为找,type为1为捡
-					title:'',
-					publisher: 0,
-					publishername:'',
-					name: '',
-					phone: '',
-					college: '',
-					intro: '',
-					selectType: '',
-					address: '',
-					longitude: 0, //经度
-					latitude: 0, //纬度
-					description: '',
-					fileList:[],
-					time:'',
-					status: '0'
-				}
+				this.$refs.form1.validate().then(async (valid) => {
+					console.log(valid);
+					if (valid) {
+						let data = new Date()
+						this.findInfo.time = data.getTime().toString()
+						let result = await this.$api.find(this.findInfo)
+						console.log('result', result);
+						if (result.status === 200) {
+							this.$refs.uToast.show({
+								type: 'success',
+								message: result.message,
+								iconUrl: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
+								duration: '500'
+							})
+						} else {
+							this.$refs.uToast.show({
+								type: 'error',
+								message: result.message,
+								iconUrl: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+								duration: '500'
+							})
+						}
+						this.findInfo = {
+							type: 0, //type为0为找,type为1为捡
+							title: '',
+							publisher: 0,
+							publishername: '',
+							publisherimg: '',
+							name: '',
+							phone: '',
+							college: '',
+							intro: '',
+							selectType: '',
+							address: '',
+							longitude: 0, //经度
+							latitude: 0, //纬度
+							description: '',
+							fileList: [],
+							time: '',
+							status: '0'
+						}
+					}
+				})
+
 			},
 			async release2() {
-				if(this.goodsInfo.fileList.length <= 0){
+				if (this.goodsInfo.fileList.length <= 0) {
 					this.$refs.uToast.show({
 						type: 'error',
 						message: '请拍取至少一张物品图片...',
 						iconUrl: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
 						duration: '1500'
 					})
-					return ;
+					return;
+				}
+				if (this.goodsInfo.title === '') {
+					this.$refs.uToast.show({
+						type: 'error',
+						message: '标题为必填项',
+						iconUrl: 'https://cdn.uviewui.com/uview/demo/toast/error.png',
+						duration: '1500'
+					})
+					return;
 				}
 				let data = new Date()
 				this.goodsInfo.time = data.getTime().toString()
@@ -414,9 +481,10 @@
 					})
 				}
 				this.goodsInfo = {
-					type:1,  //type为0为找,type为1为捡
+					type: 1, //type为0为找,type为1为捡
 					publisher: this.publisher,
-					publishername:'',
+					publishername: '',
+					publisherimg: '',
 					title: '', //物品标题
 					selectType: '', //物品类型选择
 					address: '', //详细地址
@@ -487,7 +555,7 @@
 					}).catch(err => {
 						console.log(err);
 					})
-			
+
 				})
 			},
 			//删除find图片
@@ -561,7 +629,7 @@
 
 			.lossAddress {
 				width: 100%;
-				height: 360rpx;
+				// height: 360rpx;
 				margin-top: 30rpx;
 				background-color: #fff;
 				border-radius: 20rpx;
@@ -587,6 +655,7 @@
 					}
 				}
 			}
+
 			.img {
 				margin-top: 10rpx;
 				box-sizing: border-box;
@@ -594,14 +663,14 @@
 				width: 100%;
 				padding: 30rpx 10rpx;
 				margin: 0 auto;
-			
+
 				/deep/ .u-upload__button {
 					background-color: #999;
 					border-radius: 20rpx;
 					width: 202rpx !important;
 					height: 202rpx !important;
 				}
-			
+
 				/deep/ .u-upload__wrap__preview {
 					width: 204rpx;
 					height: 204rpx;
@@ -623,11 +692,11 @@
 				padding: 30rpx 10rpx;
 
 				.input {
-					width: 90%;
+					width: 95%;
 					background-color: #f8f8f8;
 					margin: 0 auto 20rpx;
 					height: 50rpx;
-					padding-left: 24rpx !important;
+					padding:30rpx 24rpx !important;
 				}
 
 				.type-list {
