@@ -2,23 +2,36 @@
   <div id="lineBox" style="width: 800px; height: 300px;"></div>
 </template>
 <script>
+import { getArticals } from "@/api/index";
+import utils from '@/utils/utils'
 export default {
     name:'line-echart',
     data() {
      return {
        option: null,
        myChart: null,
+       timeData:[],
+       numData:[]
     };
   },
   mounted() {
     this.initData();
   },
   methods: {
-    initData() {
+    //初始化数据
+    //初始化数据
+    async initData() {
+      const res = await getArticals();
+      if (res.status == 200) {
+        let {time,data} = utils.dealTime(res.data);
+        console.log('123132',time,data);
+        this.timeData = JSON.parse(JSON.stringify(time))
+        this.numData = JSON.parse(JSON.stringify(data))
+      }
       this.option = {
         xAxis: {
           type: "category",
-          data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+          data: this.timeData,
         },
         grid:{
             top:40,
@@ -31,7 +44,7 @@ export default {
         },
         series: [
           {
-            data: [150, 230, 224, 218, 135, 147, 260],
+            data: this.numData,
             type: "line",
           },
         ],

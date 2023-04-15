@@ -1,26 +1,51 @@
 <template>
   <div>
+    <div class="search">
+      <el-input
+        class="inp"
+        v-model="pagination.searchVal"
+        placeholder="请输入搜索内容"
+      ></el-input>
+      <el-dropdown style="margin-right: 16px" @command="select">
+        <el-button type="primary" size="small">
+          {{this.selectTitle}}<i class="el-icon-arrow-down el-icon--right"></i>
+        </el-button>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="0">待审批</el-dropdown-item>
+          <el-dropdown-item command="1">通过审批</el-dropdown-item>
+          <el-dropdown-item command="2">拒绝审批</el-dropdown-item>
+          <el-dropdown-item command="3">已寻得</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+      <el-button
+        type="primary"
+        icon="el-icon-search"
+        size="small"
+        @click="search"
+        >搜索</el-button
+      >
+    </div>
     <el-table :data="tableData" style="width: 100%">
       <el-table-column type="expand">
         <template slot-scope="props">
           <el-form label-position="left" inline class="demo-table-expand">
             <el-form-item label="标题">
-              <span>{{ props.row.title }}</span>
+              <span class="item">{{ props.row.title }}</span>
             </el-form-item>
             <el-form-item label="昵称">
-              <span>{{ props.row.shop }}</span>
+              <span class="item">{{ props.row.shop }}</span>
             </el-form-item>
             <el-form-item label="学院">
-              <span>{{ props.row.shop }}</span>
+              <span class="item">{{ props.row.shop }}</span>
             </el-form-item>
             <el-form-item label="类型">
-              <span>{{ props.row.id }}</span>
+              <span class="item">{{ props.row.id }}</span>
             </el-form-item>
             <el-form-item label="地址">
-              <span>{{ props.row.address }}</span>
+              <span class="item">{{ props.row.address }}</span>
             </el-form-item>
             <el-form-item label="描述" style="display: block; width: 100%">
-              <span>{{ props.row.category }}</span>
+              <span class="item">{{ props.row.category }}</span>
             </el-form-item>
             <el-form-item
               v-if="props.row.imgList && props.row.imgList.length"
@@ -52,11 +77,12 @@
       <el-table-column label="日期" prop="time"> </el-table-column>
       <el-table-column label="状态" prop="status">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === '0'" type="warning">待审批</el-tag>
-          <el-tag v-if="scope.row.status === '1'" type="success">已审批</el-tag>
+          <el-tag v-if="scope.row.status === '0'" type="info">待审批</el-tag>
+          <el-tag v-if="scope.row.status === '1'" type="success">通过审批</el-tag>
           <el-tag v-if="scope.row.status === '2'" type="danger"
             >拒绝审批</el-tag
           >
+          <el-tag v-if="scope.row.status === '3'" type="success">已寻得</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="操作">
@@ -72,7 +98,7 @@
     </el-table>
     <div class="pagination">
       <el-pagination
-        style="position: absolute; right: 0;"
+        style="position: absolute; right: 0"
         @size-change="handleSizeChange"
         :current-page="pagination.currentPage"
         @current-change="handleCurrentChange"
@@ -96,11 +122,15 @@ export default {
   data() {
     return {
       tableData: [],
+      selectTitle:'选择状态',
+      selectVal:['待审批','通过审批','拒绝审批','已寻得'],
       pagination: {
         total: 0,
         pageSize: 10,
         pageSizes: [10, 20, 30, 40, 50],
         currentPage: 1,
+        searchVal: '',
+        command:''
       },
     };
   },
@@ -138,11 +168,31 @@ export default {
       });
       this.init();
     },
+    search(){
+      this.init()
+    },
+    select(command){
+      console.log(command);
+      this.pagination.command = command
+      this.selectTitle = this.selectVal[command]
+    }
   },
 };
 </script>
 
 <style lang="less" scoped>
+.item{
+  color: #1F6CDD;
+}
+.search {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  .inp {
+    width: 300px;
+    margin-right: 16px;
+  }
+}
 .demo-table-expand {
   font-size: 0;
   padding: 0 20px;

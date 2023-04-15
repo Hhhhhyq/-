@@ -40,6 +40,7 @@ sqlApi.getAllArtical = (res,page)=>{
                     item.imgList = item.contentimg.split(',')
                 }
             })
+            
             res.send({
                 status:200,
                 message:'获取成功！',
@@ -166,6 +167,23 @@ sqlApi.sendComment = (res,data)=>{
         }
     }
 
+    connection.sqlConnect(sqlStr,paramsArr,callback)
+}
+sqlApi.sendReply = (res,data)=>{
+    console.log(data);
+    let time = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
+    let sqlStr = 'INSERT INTO reply(id,publishername,content,time) VALUES(?,?,?,?)'
+    let paramsArr = [data.id,data.publishername,data.content,time]
+    let callback = (err,data1)=>{
+        if(err){
+            console.log(err);
+        }else {
+            res.send({
+                status:200,
+                message:'回复成功'
+            })
+        }
+    }
     connection.sqlConnect(sqlStr,paramsArr,callback)
 }
 module.exports = sqlApi

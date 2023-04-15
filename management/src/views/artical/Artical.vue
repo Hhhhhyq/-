@@ -1,5 +1,9 @@
 <template>
   <div class="artical">
+    <div class="search">
+      <el-input class="inp" v-model="pageInfo.searchVal" placeholder="请输入搜索内容"></el-input>
+      <el-button type="primary" icon="el-icon-search" size="small" @click="search">搜索</el-button>
+    </div>
     <el-card
       shadow="hover"
       class="bt"
@@ -74,7 +78,7 @@
 </template>
 
 <script>
-import { getAllArtical,deleteArticals} from "@/api/index";
+import { getAllArtical, deleteArticals } from "@/api/index";
 export default {
   name: "artical",
   data() {
@@ -83,6 +87,7 @@ export default {
       pageInfo: {
         currentPage: 1,
         pageSize: 10,
+        searchVal:''
       },
     };
   },
@@ -111,7 +116,6 @@ export default {
       if (res.status == 200) {
         this.articalList = res.data;
       }
-      console.log(res);
     },
     handleCurrentChange(page) {
       this.pageInfo.currentPage = page;
@@ -120,12 +124,12 @@ export default {
     },
     async deleteitem(item) {
       console.log(item);
-      const res = await deleteArticals(item)
+      const res = await deleteArticals(item);
       if (res.status == 200) {
         this.init();
         this.$message({
           type: "success",
-          message: "删除成功!"
+          message: "删除成功!",
         });
       }
     },
@@ -145,12 +149,25 @@ export default {
           });
         });
     },
+    search(){
+      this.pageInfo.currentPage = 1
+      this.pageInfo.pageSize = 10
+      this.init()
+    }
   },
 };
 </script>
 
 <style lang="less" scoped>
 .artical {
+  .search{
+    display: flex;
+    align-items: center;
+    .inp{
+      width: 300px;
+      margin-right: 16px;
+    }
+  }
   .bt {
     margin: 20px 0px;
     position: relative;

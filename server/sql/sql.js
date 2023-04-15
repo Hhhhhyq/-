@@ -349,8 +349,8 @@ sqlApi.getAllFind = (res) => {
 //存储双方聊天记录
 sqlApi.chatRecord = (data) => {
   let sqlStr =
-    "INSERT INTO chatlist(content,reciveid,sendid,sendtime,isread) VALUES(?,?,?,?,?)";
-  let paramsArr = [data.content, data.reciveid, data.sendid, data.sendtime,data.isread];
+    "INSERT INTO chatlist(content,img,reciveid,sendid,sendtime,type,isread) VALUES(?,?,?,?,?,?,?)";
+  let paramsArr = [data.content,data.img, data.reciveid, data.sendid, data.sendtime,data.type,data.isread];
   let callback = (err, data) => {
     if (err) {
       console.log(err);
@@ -748,12 +748,14 @@ sqlApi.getMore = (res,obj)=>{
 
 //聊天记录置为已读
 sqlApi.toRead = (res,obj)=>{
-  let sqlStr = 'UPDATE chatlist set isread=? where id=?'
-  let paramsArr = [1,obj.id]
+  // console.log(obj);
+  let sqlStr = 'UPDATE chatlist set isread=1 where id=?'
+  let paramsArr = [obj.id]
   let callback = (err,data)=>{
     if(err){
       console.log(err);
     }else {
+      console.log('data',data);
       res.send({
         status:200,
         message:'修改成功'

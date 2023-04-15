@@ -67,6 +67,8 @@ api.saw = (obj)=>http.post('/api/artical/saw',{params:{id:obj.id,saw:obj.saw}})
 api.commentThumbsUp = (obj)=>http.post('/api/artical/commentThumbsUp',{params:{obj:obj}})
 // 发表评论
 api.sendComment = (obj)=>http.post('/api/artical/sendComment',{params:{obj:obj}})
+// 发表回复
+api.sendReply = (obj)=>http.post('/api/artical/sendReply',{params:{obj:obj}})
 //获取搜索记录
 api.addSearchHistory = (obj)=>http.post('/api/users/addSearchHistory',{params:{obj:obj}})
 api.getUrgentList = ()=>http.get('/api/goods/getUrgentList')
@@ -80,4 +82,7 @@ api.deleteMyGood = (obj)=>http.post('/api/goods/deleteMyGood',{params:{obj:obj}}
 api.returnGoods = (obj)=>http.post('/api/goods/returnGoods',{params:{obj:obj}})
 //获取所有类型
 api.getAllType = ()=>http.get('/api/goods/getAllType')
+
+api.chatImgUpload = (data)=>http.upload('/api/image/chatImgUpload',{filePath:data.filePath,name:data.name});
+
 export default api

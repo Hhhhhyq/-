@@ -40,7 +40,6 @@ router.post('/addSearchHistory',function(req,res,next){
 //聊天记录置为已读
 router.post('/toRead',function(req,res,next){
   let obj = req.body.params.obj
-  console.log(obj);
-  // sqlApi.toRead(res,obj)
+  sqlApi.toRead(res,obj)
 })
 module.exports = router;

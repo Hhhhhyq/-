@@ -5,22 +5,22 @@
         <template slot-scope="props">
           <el-form label-position="left" inline class="demo-table-expand">
             <el-form-item label="标题">
-              <span>{{ props.row.name }}</span>
+              <span class="item">{{ props.row.name }}</span>
             </el-form-item>
             <el-form-item label="昵称">
-              <span>{{ props.row.shop }}</span>
+              <span class="item">{{ props.row.shop }}</span>
             </el-form-item>
             <el-form-item label="学院">
-              <span>{{ props.row.shop }}</span>
+              <span class="item">{{ props.row.shop }}</span>
             </el-form-item>
             <el-form-item label="类型">
-              <span>{{ props.row.id }}</span>
+              <span class="item">{{ props.row.id }}</span>
             </el-form-item>
             <el-form-item label="地址">
-              <span>{{ props.row.address }}</span>
+              <span class="item">{{ props.row.address }}</span>
             </el-form-item>
             <el-form-item label="描述" style="display: block; width: 100%">
-              <span>{{ props.row.category }}</span>
+              <span class="item">{{ props.row.category }}</span>
             </el-form-item>
             <el-form-item
               v-if="props.row.imgList && props.row.imgList.length"
@@ -180,6 +180,9 @@ export default {
 /deep/ .el-popover {
   background-color: #fff !important;
   padding: 10px !important;
+}
+.item{
+  color: #1F6CDD;
 }
 .no-img {
   color: #bbbbbb;

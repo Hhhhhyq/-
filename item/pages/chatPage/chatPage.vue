@@ -27,15 +27,21 @@
 						<image :src="toImg" alt="">
 					</view>
 					<view class="content">
-						<view class="txt">{{item.content}}
+						<view class="txt" v-if="item.type == '0'">{{item.content}}
 							<view class="jiantou"></view>
+						</view>
+						<view class="txt" v-else>
+							<image v-if="item.img !== '' || item.img !== null" :src="item.img" alt="">
 						</view>
 					</view>
 				</view>
 				<view class="chatItem r" v-else>
 					<view class="content">
-						<view class="txt">{{item.content}}
+						<view class="txt" v-if="item.type == '0'">{{item.content}}
 							<view class="jiantou"></view>
+						</view>
+						<view class="txt" v-else>
+							<image v-if="item.img !== '' || item.img !== null" :src="item.img" alt="">
 						</view>
 					</view>
 					<view class="image">
@@ -46,7 +52,8 @@
 			<view id="bot" style='height:1px;width:100%'></view>
 		</scroll-view>
 		<view class="chatInp">
-			<u-icon style="margin:0 10rpx;" size="24" name="mic"></u-icon>
+			<u-icon class="phone" name="photo-fill" color="#666" size="28" @click="upload"></u-icon>
+			<!-- <u-icon style="margin:0 10rpx;" size="24" name="mic"></u-icon> -->
 			<u--input placeholder="请输入内容" border="surround" v-model="value"></u--input>
 			<view class="send" @click="sendMessage">发送</view>
 		</view>
@@ -154,11 +161,14 @@
 						value: this.value
 					}
 					console.log('1', this.toId);
-					this.socket.emit('msg', this.value, this.myInfo.id, this.toId);
+					let type="0",img="";
+					this.socket.emit('msg', this.value, this.myInfo.id, this.toId,type,img);
 					let obj = {
 						reciveid: Number(this.toId),
 						content: this.value,
-						sendid:this.myInfo.id
+						sendid:this.myInfo.id,
+						img:'',
+						type:"0"
 					}
 					this.chatList.push(obj)
 					console.log(this.chatList);
@@ -170,7 +180,49 @@
 				this.socket.on('msg', data => {
 					this.chatList.push(data)
 				})
-			}
+			},
+			// 文章图片上传
+			upload() {
+				let that = this
+				uni.chooseImage({
+					count: 1, //上传图片的数量，默认是9
+					sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+					sourceType: ['album'], //从相册选择
+					success: function(res) {
+						const tempFilePaths = res.tempFilePaths; //拿到选择的图片，是一个数组
+						tempFilePaths.forEach(item => {
+							let data = {
+								filePath: item,
+								name: "file"
+							}
+							that.uploadFileListPromise(data)
+						})
+					}
+				});
+			},
+			uploadFileListPromise(data) {
+				return new Promise((resolve, reject) => {
+					this.$api.chatImgUpload(data).then(res => {
+						console.log(res.data.url);
+						let type = "1",value="";
+						this.socket.emit('msg', value, this.myInfo.id, this.toId,type,res.data.url);
+						// this.goodsInfo.fileList.push({
+							let obj = {
+								reciveid: Number(this.toId),
+								content: '',
+								sendid:this.myInfo.id,
+								img:res.data.url,
+								type:"1"
+							}
+							this.chatList.push(obj)
+						// 	url: res.data.url
+						// })
+					}).catch(err => {
+						console.log(err);
+					})
+			
+				})
+			},
 		}
 	}
 </script>
@@ -326,7 +378,10 @@
 						}
 					}
 
-
+					image{
+						width: 120rpx;
+						height: 120rpx;
+					}
 				}
 			}
 
@@ -366,7 +421,11 @@
 			display: flex;
 			align-items: center;
 			background-color: #fff;
-
+			.phone{
+				margin-left: 10rpx;
+				width: 60rpx;
+				text-align: center;
+			}
 			.u-input {
 				height: 60rpx;
 				border-radius: 10rpx;

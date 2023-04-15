@@ -13,12 +13,14 @@ module.exports = function (io) {
       socket.emit('login',socket.id)
     })
     //消息发送
-    socket.on('msg',(msg,fromid,toid)=>{
+    socket.on('msg',(msg,fromid,toid,type,img)=>{
       console.log(users[toid],'发送给',fromid)
       if(users[toid]){
         let data = {
           id:fromid,
-          value:msg
+          value:msg,
+          type:type,
+          img:img
         }
         socket.to(users[toid]).emit('msg',data)
       }
@@ -26,8 +28,10 @@ module.exports = function (io) {
         sendid:fromid,
         reciveid:toid,
         content: msg,
+        img:img,
         sendtime:moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-        isRead:1
+        type:type,
+        isRead:0
       }
       sqlApi.chatRecord(data)
     })

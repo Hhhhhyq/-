@@ -40,7 +40,7 @@
 						<view class="all-num" v-if="this.commentNum && this.commentNum!==0">({{this.commentNum}}条)</view>
 					</view>
 					<view  v-for="(item,index) in this.commentList" :key="index">
-						<comment-item :articalId="id" :commentlist="item"></comment-item>
+						<comment-item :ref="`children${index}`" @changeType="changeType" :index="index" :inpVal="inpValue" :articalId="id" :commentlist="item"></comment-item>
 					</view>
 				</view>
 				<view v-else></view>
@@ -48,7 +48,7 @@
 		</view>
 		<view  class="edit" :style="{bottom: bottom}">
 			<view class="inp">
-			 	<input class="uni-input"  @focus="focus" @blur="blur" :adjust-position="false" type="text" placeholder="请输入内容" @input="handleInput" :value="inpValue" />
+			 	<input class="uni-input" :focus="isFocus" @focus="focus" @blur="blur" :adjust-position="false" type="text" placeholder="请输入内容" @input="handleInput" :value="inpValue" />
 			 </view>
 			 <view class="send" @click="sendTxt">发送</view>
 		</view>
@@ -77,14 +77,16 @@
 				bottom:'0px',
 				scrollTop:0,
 				scrollBoxHeight:'',
-				inpType:'评论'
+				inpType:'评论',
+				childerenIndex:0,
+				isFocus:false 
 			};
 		},
 		onLoad(options) {
 			let articalInfo = JSON.parse(options.info)
 			this.id = Number(articalInfo.id)
 			this.articalInfo = articalInfo
-			this.getComment(this.id)
+			this.getComment()
 			
 		},
 		created() {
@@ -114,8 +116,19 @@
 			back() {
 				uni.navigateBack()
 			},
+			changeType(e){
+				this.inpType = '回复'
+				this.childerenIndex = e
+				this.isFocus = true
+			},
+			// commentBack(){
+			// 	this.$nextTick(()=>{
+			// 		this.getComment()
+			// 	})
+			// },
 			//获取评论
-			async getComment(id){
+			async getComment(){
+				let id = this.id
 				let res = await this.$api.getComment(id)
 				if(res.status == 200){
 					this.commentNum = res.data.count
@@ -128,12 +141,12 @@
 				}
 				this.inpValue = detail.value.trim();
 			},
-			changeInpType(){
-				this.inpType = '回复'
-				uni.showKeyboard()
-			},
 			//发表评论
 			async sendTxt(){
+				if(this.inpValue.trim() == ''){
+					return ;
+				}
+				console.log(this.inpType);
 				if(this.inpType === '评论'){
 					let obj = {
 						articalId:this.id,
@@ -152,12 +165,20 @@
 							duration: '500'
 						})
 					}else{
-						this.getComment(this.id)
+						this.getComment()
 					}
 				}else {
-					console.log('回复');
+					this.$nextTick(()=>{
+						let str = 'children' + this.childerenIndex
+						this.$refs[str][0].sendReply()
+						setTimeout(()=>{
+							this.getComment()
+						},0)
+					})
 				}
 				this.inpValue = ''
+				this.isFocus = false
+				this.inpType = '评论'
 			},
 			
 			// 获得焦点后

@@ -33,7 +33,7 @@ import {
   Tabs,
   TabPane,
   MessageBox,
-  Upload
+  Upload,
 } from "element-ui";
 Vue.use(Button);
 Vue.use(Select);

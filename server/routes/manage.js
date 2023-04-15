@@ -73,5 +73,8 @@ router.post('/updateType',function(req,res,next){
 router.get('/getCountNum',function(req,res,next){
     sqlApi.getCountNum(res)
 })
+router.get('/getArticals',function(req,res,next){
+    sqlApi.getArticals(res)
+})
 
 module.exports = router;

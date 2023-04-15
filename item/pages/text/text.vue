@@ -20,7 +20,7 @@
 						<view class="content-l">{{item.name}}</view>
 						<view class="conetent-r">{{item.list[item.length-1].sendtime | dealTime}}</view>
 					</view>
-					<view class="name">{{item.list[item.length-1].content}}</view>
+					<view class="name">{{item.list[item.length-1].type == '0' ? item.list[item.length-1].content : '[图片表情]' }}</view>
 				</view>
 			</view>
 		</scroll-view>
@@ -38,6 +38,7 @@
 			}
 		},
 		onLoad() {
+			this.init()
 		},
 		created() {
 			let token = uni.getStorageSync('token')
@@ -74,7 +75,7 @@
 						arr.push(res.data[item])
 						let noreadNum = 0
 						res.data[item].list.forEach((item)=>{
-							if(item.isread ==0){
+							if(item.isread ==0 && item.sendid !== id){
 								noreadNum++
 							}
 						})
@@ -123,6 +124,7 @@
 				justify-content: center;
 				box-sizing: border-box;
 				.name{
+					width: 100%;
 					font-size: 20rpx;
 					// height: 40rpx;
 					color: #666666;

@@ -38,7 +38,7 @@
 			</view>
 			<view class="sub-content" v-if="this.comment.children && this.comment.children.length">
 				<template v-if="this.comment.children.length <= 3">
-					<view class="sub-content-item" v-for="(subitem,index) in comment.children" :key="index">
+					<view class="sub-content-item" v-for="(subitem,index1) in comment.children" :key="index1">
 						{{subitem.publishername}}回复: {{subitem.content}}
 					</view>
 				</template>
@@ -65,6 +65,7 @@
 				</template>
 			</view>
 		</view>
+		<u-toast ref="uToast"></u-toast>
 	</view>
 </template>
 
@@ -79,6 +80,14 @@
 			commentlist: {
 				type: Object,
 				default: () => {}
+			},
+			inpVal:{
+				type:String,
+				default:''
+			},
+			index:{
+				type:Number,
+				default:0
 			}
 		},
 		created() {
@@ -185,6 +194,33 @@
 					})
 				}
 			},
+			changeInpType(){
+				this.inpType = '回复'
+				this.$emit('changeType',this.index)
+				// uni.showKeyboard()
+				console.log('111',this.comment);
+			},
+			//发表评论
+			async sendReply(){
+				let obj = {
+					id:this.comment.id,
+					publishername:this.userInfo.name,
+					content:this.inpVal,
+				}
+				const res = await this.$api.sendReply(obj)
+				
+				if(res.status == 200){
+					this.comment.children.push(obj)
+					console.log(this.comment);
+					this.$refs.uToast.show({
+						type: 'success',
+						message: '回复成功',
+						iconUrl: 'https://cdn.uviewui.com/uview/demo/toast/success.png',
+						duration: '500'
+					})
+					this.$emit('getcomment')
+				}
+			}
 		}
 	}
 </script>

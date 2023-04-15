@@ -137,3 +137,11 @@ export function getCountNum(param){
         method:'get'
     })
 }
+
+// 首页文章
+export function getArticals(){
+    return request({
+        url:'/manage/getArticals',
+        method:'get'
+    })
+}

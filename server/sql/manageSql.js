@@ -232,9 +232,22 @@ sqlApi.rejectApproval = (res, item) => {
 };
 //获取文章，分页获取
 sqlApi.getAllArtical = (res, pageInfo) => {
-  let pageStart = (pageInfo.currentPage - 1) * 10;
-  let sqlStr = "SELECT * FROM artical LIMIT ?,10";
-  let paramsArr = [pageStart];
+  console.log(pageInfo);
+  let pageStart = 0;
+  let sqlStr = "";
+  let paramsArr = [];
+  if (pageInfo.searchVal == "") {
+    pageStart = (pageInfo.currentPage - 1) * 10;
+    sqlStr = "SELECT * FROM artical LIMIT ?,10";
+    paramsArr = [pageStart];
+  } else {
+    pageStart = (pageInfo.currentPage - 1) * 10;
+    sqlStr =
+      "SELECT * FROM artical WHERE title LIKE ? OR content LIKE ? LIMIT ?,10";
+    let searchVal = "%" + pageInfo.searchVal + "%";
+    paramsArr = [searchVal, searchVal, pageStart];
+  }
+
   let callback = (err, data) => {
     if (err) {
       console.log(err);
@@ -378,124 +391,507 @@ sqlApi.deleteUser = (res, id) => {
 sqlApi.getAllRelease = (res, pageInfo) => {
   //获取总数
   let all = 0;
-  connection.sqlConnect("SELECT * from releasegoods", [], (err, dataAll) => {
-    if (err) {
-      console.log(err);
-    } else {
-      all = dataAll.length;
-    }
-  });
-  let pageStart = (pageInfo.currentPage - 1) * pageInfo.pageSize;
-  let sqlStr = "SELECT * from releasegoods LIMIT ?,?";
-  let sqlStr1 = "SELECT * from releaseimg where id=?";
-  let paramsArr = [pageStart, pageInfo.pageSize];
-  let callback = (err, data) => {
-    if (err) {
-      console.log(err);
-      res.send({
-        status: 301,
-        message: "获取失败",
-      });
-    } else {
-      let result = JSON.parse(JSON.stringify(data));
-      if (!result.length) {
+  if (pageInfo.searchVal == "" && pageInfo.command == "") {
+    connection.sqlConnect("SELECT * from releasegoods", [], (err, dataAll) => {
+      if (err) {
+        console.log(err);
+      } else {
+        all = dataAll.length;2
+      }
+    });
+    let pageStart = (pageInfo.currentPage - 1) * pageInfo.pageSize;
+    let sqlStr = "SELECT * from releasegoods LIMIT ?,?";
+    let sqlStr1 = "SELECT * from releaseimg where id=?";
+    let paramsArr = [pageStart, pageInfo.pageSize];
+    let callback = (err, data) => {
+      if (err) {
+        console.log(err);
         res.send({
-          status: 200,
-          message: "success",
-          data: [],
-          total: all,
+          status: 301,
+          message: "获取失败",
         });
-        return;
-      }
-      for (let i = 0; i < result.length; i++) {
-        connection.sqlConnect(sqlStr1, result[i].id, (err1, data1) => {
-          if (err) {
-            console.log(err1);
-          } else {
-            data1 = JSON.parse(JSON.stringify(data1));
-            result[i].goodsList = JSON.parse(JSON.stringify(data1));
-            result[i] = JSON.parse(JSON.stringify(result[i]));
-            if (i >= result.length - 1) {
-              result = JSON.parse(JSON.stringify(result));
-              res.send({
-                status: 200,
-                message: "success",
-                data: result,
-                total: all,
-              });
+      } else {
+        let result = JSON.parse(JSON.stringify(data));
+        if (!result.length) {
+          res.send({
+            status: 200,
+            message: "success",
+            data: [],
+            total: all,
+          });
+          return;
+        }
+        for (let i = 0; i < result.length; i++) {
+          connection.sqlConnect(sqlStr1, result[i].id, (err1, data1) => {
+            if (err) {
+              console.log(err1);
+            } else {
+              data1 = JSON.parse(JSON.stringify(data1));
+              result[i].goodsList = JSON.parse(JSON.stringify(data1));
+              result[i] = JSON.parse(JSON.stringify(result[i]));
+              if (i >= result.length - 1) {
+                result = JSON.parse(JSON.stringify(result));
+                res.send({
+                  status: 200,
+                  message: "success",
+                  data: result,
+                  total: all,
+                });
+              }
             }
-          }
-        });
+          });
+        }
       }
-    }
-  };
-  connection.sqlConnect(sqlStr, paramsArr, callback);
+    };
+    connection.sqlConnect(sqlStr, paramsArr, callback);
+  }
+  else if(pageInfo.searchVal !== '' && pageInfo.command == ""){
+    let searchVal = "%" + pageInfo.searchVal + "%";
+    connection.sqlConnect("SELECT * from releasegoods WHERE title LIKE ?", [searchVal], (err, dataAll) => {
+      if (err) {
+        console.log(err);
+      } else {
+        all = dataAll.length;
+      }
+    });
+    let pageStart = (pageInfo.currentPage - 1) * pageInfo.pageSize;
+    let sqlStr = "SELECT * from releasegoods WHERE title LIKE ? LIMIT ?,?";
+    let sqlStr1 = "SELECT * from releaseimg where id=?";
+    let paramsArr = [searchVal,pageStart, pageInfo.pageSize];
+    let callback = (err, data) => {
+      if (err) {
+        console.log(err);
+        res.send({
+          status: 301,
+          message: "获取失败",
+        });
+      } else {
+        let result = JSON.parse(JSON.stringify(data));
+        if (!result.length) {
+          res.send({
+            status: 200,
+            message: "success",
+            data: [],
+            total: all,
+          });
+          return;
+        }
+        for (let i = 0; i < result.length; i++) {
+          connection.sqlConnect(sqlStr1, result[i].id, (err1, data1) => {
+            if (err) {
+              console.log(err1);
+            } else {
+              data1 = JSON.parse(JSON.stringify(data1));
+              result[i].goodsList = JSON.parse(JSON.stringify(data1));
+              result[i] = JSON.parse(JSON.stringify(result[i]));
+              if (i >= result.length - 1) {
+                result = JSON.parse(JSON.stringify(result));
+                res.send({
+                  status: 200,
+                  message: "success",
+                  data: result,
+                  total: all,
+                });
+              }
+            }
+          });
+        }
+      }
+    };
+    connection.sqlConnect(sqlStr, paramsArr, callback);
+  }
+  else if(pageInfo.searchVal == '' && pageInfo.command !== ''){
+    connection.sqlConnect("SELECT * from releasegoods WHERE status=?", [pageInfo.command], (err, dataAll) => {
+      if (err) {
+        console.log(err);
+      } else {
+        all = dataAll.length;
+      }
+    });
+    let pageStart = (pageInfo.currentPage - 1) * pageInfo.pageSize;
+    let sqlStr = "SELECT * from releasegoods WHERE status=? LIMIT ?,?";
+    let sqlStr1 = "SELECT * from releaseimg where id=?";
+    let paramsArr = [pageInfo.command,pageStart, pageInfo.pageSize];
+    let callback = (err, data) => {
+      if (err) {
+        console.log(err);
+        res.send({
+          status: 301,
+          message: "获取失败",
+        });
+      } else {
+        let result = JSON.parse(JSON.stringify(data));
+        if (!result.length) {
+          res.send({
+            status: 200,
+            message: "success",
+            data: [],
+            total: all,
+          });
+          return;
+        }
+        for (let i = 0; i < result.length; i++) {
+          connection.sqlConnect(sqlStr1, result[i].id, (err1, data1) => {
+            if (err) {
+              console.log(err1);
+            } else {
+              data1 = JSON.parse(JSON.stringify(data1));
+              result[i].goodsList = JSON.parse(JSON.stringify(data1));
+              result[i] = JSON.parse(JSON.stringify(result[i]));
+              if (i >= result.length - 1) {
+                result = JSON.parse(JSON.stringify(result));
+                res.send({
+                  status: 200,
+                  message: "success",
+                  data: result,
+                  total: all,
+                });
+              }
+            }
+          });
+        }
+      }
+    };
+    connection.sqlConnect(sqlStr, paramsArr, callback);
+  }else {
+    let searchVal = "%" + pageInfo.searchVal + "%";
+    connection.sqlConnect("SELECT * from releasegoods WHERE title LIKE ? AND status=?", [pageInfo.command,searchVal], (err, dataAll) => {
+      if (err) {
+        console.log(err);
+      } else {
+        all = dataAll.length;
+      }
+    });
+    let pageStart = (pageInfo.currentPage - 1) * pageInfo.pageSize;
+    let sqlStr = "SELECT * from releasegoods WHERE status=? AND title LIKE ? LIMIT ?,?";
+    let sqlStr1 = "SELECT * from releaseimg where id=?";
+    let paramsArr = [pageInfo.command,searchVal,pageStart, pageInfo.pageSize];
+    let callback = (err, data) => {
+      if (err) {
+        console.log(err);
+        res.send({
+          status: 301,
+          message: "获取失败",
+        });
+      } else {
+        let result = JSON.parse(JSON.stringify(data));
+        if (!result.length) {
+          res.send({
+            status: 200,
+            message: "success",
+            data: [],
+            total: all,
+          });
+          return;
+        }
+        for (let i = 0; i < result.length; i++) {
+          connection.sqlConnect(sqlStr1, result[i].id, (err1, data1) => {
+            if (err) {
+              console.log(err1);
+            } else {
+              data1 = JSON.parse(JSON.stringify(data1));
+              result[i].goodsList = JSON.parse(JSON.stringify(data1));
+              result[i] = JSON.parse(JSON.stringify(result[i]));
+              if (i >= result.length - 1) {
+                result = JSON.parse(JSON.stringify(result));
+                res.send({
+                  status: 200,
+                  message: "success",
+                  data: result,
+                  total: all,
+                });
+              }
+            }
+          });
+        }
+      }
+    };
+    connection.sqlConnect(sqlStr, paramsArr, callback);
+  }
+  // connection.sqlConnect("SELECT * from releasegoods", [], (err, dataAll) => {
+  //   if (err) {
+  //     console.log(err);
+  //   } else {
+  //     all = dataAll.length;
+  //   }
+  // });
+  // let pageStart = (pageInfo.currentPage - 1) * pageInfo.pageSize;
+  // let sqlStr = "SELECT * from releasegoods LIMIT ?,?";
+  // let sqlStr1 = "SELECT * from releaseimg where id=?";
+  // let paramsArr = [pageStart, pageInfo.pageSize];
+  // let callback = (err, data) => {
+  //   if (err) {
+  //     console.log(err);
+  //     res.send({
+  //       status: 301,
+  //       message: "获取失败",
+  //     });
+  //   } else {
+  //     let result = JSON.parse(JSON.stringify(data));
+  //     if (!result.length) {
+  //       res.send({
+  //         status: 200,
+  //         message: "success",
+  //         data: [],
+  //         total: all,
+  //       });
+  //       return;
+  //     }
+  //     for (let i = 0; i < result.length; i++) {
+  //       connection.sqlConnect(sqlStr1, result[i].id, (err1, data1) => {
+  //         if (err) {
+  //           console.log(err1);
+  //         } else {
+  //           data1 = JSON.parse(JSON.stringify(data1));
+  //           result[i].goodsList = JSON.parse(JSON.stringify(data1));
+  //           result[i] = JSON.parse(JSON.stringify(result[i]));
+  //           if (i >= result.length - 1) {
+  //             result = JSON.parse(JSON.stringify(result));
+  //             res.send({
+  //               status: 200,
+  //               message: "success",
+  //               data: result,
+  //               total: all,
+  //             });
+  //           }
+  //         }
+  //       });
+  //     }
+  //   }
+  // };
+  // connection.sqlConnect(sqlStr, paramsArr, callback);
 };
 sqlApi.getAllFind = (res, pageInfo) => {
   //获取总数
   let all = 0;
-  connection.sqlConnect("SELECT * from findgoods", [], (err, dataAll) => {
-    if (err) {
-      console.log(err);
-    } else {
-      all = dataAll.length;
-    }
-  });
-  let pageStart = (pageInfo.currentPage - 1) * pageInfo.pageSize;
-  let sqlStr = "SELECT * from findgoods LIMIT ?,?";
-  let sqlStr1 = "SELECT * from findimg where id=?";
-  let paramsArr = [pageStart, pageInfo.pageSize];
-  let callback = (err, data) => {
-    if (err) {
-      console.log(err);
-      res.send({
-        status: 301,
-        message: "获取失败",
-      });
-    } else {
-      let result = JSON.parse(JSON.stringify(data));
-      if (!result.length) {
+  if (pageInfo.searchVal == "" && pageInfo.command == "") {
+    connection.sqlConnect("SELECT * from findgoods", [], (err, dataAll) => {
+      if (err) {
+        console.log(err);
+      } else {
+        all = dataAll.length;2
+      }
+    });
+    let pageStart = (pageInfo.currentPage - 1) * pageInfo.pageSize;
+    let sqlStr = "SELECT * from findgoods LIMIT ?,?";
+    let sqlStr1 = "SELECT * from findimg where id=?";
+    let paramsArr = [pageStart, pageInfo.pageSize];
+    let callback = (err, data) => {
+      if (err) {
+        console.log(err);
         res.send({
-          status: 200,
-          message: "success",
-          data: [],
-          total: all,
+          status: 301,
+          message: "获取失败",
         });
-        return;
-      }
-      for (let i = 0; i < result.length; i++) {
-        connection.sqlConnect(sqlStr1, result[i].id, (err1, data1) => {
-          if (err) {
-            console.log(err1);
-          } else {
-            data1 = JSON.parse(JSON.stringify(data1));
-            result[i].goodsList = JSON.parse(JSON.stringify(data1));
-            result[i] = JSON.parse(JSON.stringify(result[i]));
-            if (i >= result.length - 1) {
-              result = JSON.parse(JSON.stringify(result));
-              res.send({
-                status: 200,
-                message: "success",
-                data: result,
-                total: all,
-              });
+      } else {
+        let result = JSON.parse(JSON.stringify(data));
+        if (!result.length) {
+          res.send({
+            status: 200,
+            message: "success",
+            data: [],
+            total: all,
+          });
+          return;
+        }
+        for (let i = 0; i < result.length; i++) {
+          connection.sqlConnect(sqlStr1, result[i].id, (err1, data1) => {
+            if (err) {
+              console.log(err1);
+            } else {
+              data1 = JSON.parse(JSON.stringify(data1));
+              result[i].goodsList = JSON.parse(JSON.stringify(data1));
+              result[i] = JSON.parse(JSON.stringify(result[i]));
+              if (i >= result.length - 1) {
+                result = JSON.parse(JSON.stringify(result));
+                res.send({
+                  status: 200,
+                  message: "success",
+                  data: result,
+                  total: all,
+                });
+              }
             }
-          }
-        });
+          });
+        }
       }
-    }
-  };
-  connection.sqlConnect(sqlStr, paramsArr, callback);
+    };
+    connection.sqlConnect(sqlStr, paramsArr, callback);
+  }
+  else if(pageInfo.searchVal !== '' && pageInfo.command == ""){
+    let searchVal = "%" + pageInfo.searchVal + "%";
+    connection.sqlConnect("SELECT * from findgoods WHERE title LIKE ?", [searchVal], (err, dataAll) => {
+      if (err) {
+        console.log(err);
+      } else {
+        all = dataAll.length;
+      }
+    });
+    let pageStart = (pageInfo.currentPage - 1) * pageInfo.pageSize;
+    let sqlStr = "SELECT * from findgoods WHERE title LIKE ? LIMIT ?,?";
+    let sqlStr1 = "SELECT * from findimg where id=?";
+    let paramsArr = [searchVal,pageStart, pageInfo.pageSize];
+    let callback = (err, data) => {
+      if (err) {
+        console.log(err);
+        res.send({
+          status: 301,
+          message: "获取失败",
+        });
+      } else {
+        let result = JSON.parse(JSON.stringify(data));
+        if (!result.length) {
+          res.send({
+            status: 200,
+            message: "success",
+            data: [],
+            total: all,
+          });
+          return;
+        }
+        for (let i = 0; i < result.length; i++) {
+          connection.sqlConnect(sqlStr1, result[i].id, (err1, data1) => {
+            if (err) {
+              console.log(err1);
+            } else {
+              data1 = JSON.parse(JSON.stringify(data1));
+              result[i].goodsList = JSON.parse(JSON.stringify(data1));
+              result[i] = JSON.parse(JSON.stringify(result[i]));
+              if (i >= result.length - 1) {
+                result = JSON.parse(JSON.stringify(result));
+                res.send({
+                  status: 200,
+                  message: "success",
+                  data: result,
+                  total: all,
+                });
+              }
+            }
+          });
+        }
+      }
+    };
+    connection.sqlConnect(sqlStr, paramsArr, callback);
+  }
+  else if(pageInfo.searchVal == '' && pageInfo.command !== ''){
+    connection.sqlConnect("SELECT * from findgoods WHERE status=?", [pageInfo.command], (err, dataAll) => {
+      if (err) {
+        console.log(err);
+      } else {
+        all = dataAll.length;
+      }
+    });
+    let pageStart = (pageInfo.currentPage - 1) * pageInfo.pageSize;
+    let sqlStr = "SELECT * from findgoods WHERE status=? LIMIT ?,?";
+    let sqlStr1 = "SELECT * from findimg where id=?";
+    let paramsArr = [pageInfo.command,pageStart, pageInfo.pageSize];
+    let callback = (err, data) => {
+      if (err) {
+        console.log(err);
+        res.send({
+          status: 301,
+          message: "获取失败",
+        });
+      } else {
+        let result = JSON.parse(JSON.stringify(data));
+        if (!result.length) {
+          res.send({
+            status: 200,
+            message: "success",
+            data: [],
+            total: all,
+          });
+          return;
+        }
+        for (let i = 0; i < result.length; i++) {
+          connection.sqlConnect(sqlStr1, result[i].id, (err1, data1) => {
+            if (err) {
+              console.log(err1);
+            } else {
+              data1 = JSON.parse(JSON.stringify(data1));
+              result[i].goodsList = JSON.parse(JSON.stringify(data1));
+              result[i] = JSON.parse(JSON.stringify(result[i]));
+              if (i >= result.length - 1) {
+                result = JSON.parse(JSON.stringify(result));
+                res.send({
+                  status: 200,
+                  message: "success",
+                  data: result,
+                  total: all,
+                });
+              }
+            }
+          });
+        }
+      }
+    };
+    connection.sqlConnect(sqlStr, paramsArr, callback);
+  }else {
+    let searchVal = "%" + pageInfo.searchVal + "%";
+    connection.sqlConnect("SELECT * from findgoods WHERE title LIKE ? AND status=?", [pageInfo.command,searchVal], (err, dataAll) => {
+      if (err) {
+        console.log(err);
+      } else {
+        all = dataAll.length;
+      }
+    });
+    let pageStart = (pageInfo.currentPage - 1) * pageInfo.pageSize;
+    let sqlStr = "SELECT * from findgoods WHERE status=? AND title LIKE ? LIMIT ?,?";
+    let sqlStr1 = "SELECT * from findimg where id=?";
+    let paramsArr = [pageInfo.command,searchVal,pageStart, pageInfo.pageSize];
+    let callback = (err, data) => {
+      if (err) {
+        console.log(err);
+        res.send({
+          status: 301,
+          message: "获取失败",
+        });
+      } else {
+        let result = JSON.parse(JSON.stringify(data));
+        if (!result.length) {
+          res.send({
+            status: 200,
+            message: "success",
+            data: [],
+            total: all,
+          });
+          return;
+        }
+        for (let i = 0; i < result.length; i++) {
+          connection.sqlConnect(sqlStr1, result[i].id, (err1, data1) => {
+            if (err) {
+              console.log(err1);
+            } else {
+              data1 = JSON.parse(JSON.stringify(data1));
+              result[i].goodsList = JSON.parse(JSON.stringify(data1));
+              result[i] = JSON.parse(JSON.stringify(result[i]));
+              if (i >= result.length - 1) {
+                result = JSON.parse(JSON.stringify(result));
+                res.send({
+                  status: 200,
+                  message: "success",
+                  data: result,
+                  total: all,
+                });
+              }
+            }
+          });
+        }
+      }
+    };
+    connection.sqlConnect(sqlStr, paramsArr, callback);
+  }
 };
 //删除已审批物品
 sqlApi.deleteGoodsItem = (res, obj) => {
-  let sqlStr = ''
+  let sqlStr = "";
   if (obj.type == "find") {
     sqlStr = "DELETE FROM findgoods WHERE id=?;DELETE FROM findimg WHERE id=?";
   } else {
-    sqlStr = "DELETE FROM releasegoods WHERE id=?;DELETE FROM releaseimg WHERE id=?";
+    sqlStr =
+      "DELETE FROM releasegoods WHERE id=?;DELETE FROM releaseimg WHERE id=?";
   }
-  let paramsArr = [obj.id,obj.id];
+  let paramsArr = [obj.id, obj.id];
   let callback = (err, data) => {
     if (err) {
       console.log(err);
@@ -508,77 +904,99 @@ sqlApi.deleteGoodsItem = (res, obj) => {
   };
   connection.sqlConnect(sqlStr, paramsArr, callback);
 };
-sqlApi.updateType = (res,obj)=>{
-  let sqlStr = ''
-  if(obj.type == 'goodstype'){
-    sqlStr = 'UPDATE common set typelist=? where id=?'
-  }else if(obj.type == 'collection'){
-    sqlStr = 'UPDATE common set colectionlist=? where id=?'
-  }else if(obj.type == 'banner'){
-    sqlStr = 'UPDATE common set bannerlist=? where id=?'
+sqlApi.updateType = (res, obj) => {
+  let sqlStr = "";
+  if (obj.type == "goodstype") {
+    sqlStr = "UPDATE common set typelist=? where id=?";
+  } else if (obj.type == "collection") {
+    sqlStr = "UPDATE common set colectionlist=? where id=?";
+  } else if (obj.type == "banner") {
+    sqlStr = "UPDATE common set bannerlist=? where id=?";
+  } else {
+    sqlStr = "UPDATE common set college=? where id=?";
   }
-  else {
-    sqlStr = 'UPDATE common set college=? where id=?'
-  }
-  let paramsArr = [obj.data,1]
-  let callback = (err,data)=>{
-    if(err){
+  let paramsArr = [obj.data, 1];
+  let callback = (err, data) => {
+    if (err) {
       console.log(err);
-    }else {
+    } else {
       res.send({
-        status:200,
-        message:'更新成功'
-      })
+        status: 200,
+        message: "更新成功",
+      });
     }
-  }
+  };
   connection.sqlConnect(sqlStr, paramsArr, callback);
-}
-sqlApi.getCountNum = (res)=>{
-  let sqlStr = 'SELECT * FROM releasegoods;SELECT * FROM artical;SELECT * FROM user;SELECT * FROM findgoods'
-  let paramsArr = []
-  let callback = (err,data)=>{
-    if(err){
+};
+sqlApi.getCountNum = (res) => {
+  let sqlStr =
+    "SELECT * FROM releasegoods;SELECT * FROM artical;SELECT * FROM user;SELECT * FROM findgoods";
+  let paramsArr = [];
+  let callback = (err, data) => {
+    if (err) {
       console.log(err);
-    }else {
-      data = JSON.parse(JSON.stringify(data))
+    } else {
+      data = JSON.parse(JSON.stringify(data));
       let obj = {
-         userCount:0,
-          goodsCount:0,
-          articalCount:0,
-          countRate:0
-      }
-      obj.articalCount = data[1].length
-      obj.userCount = data[2].length
-      
-      let index1 = 0
-      let index2 = 0
-      let index3 = 0
-      let index4 = 0
-      data[0].forEach(item=>{
-        if(item.status && item.status == '1'){
-          index1++
+        userCount: 0,
+        goodsCount: 0,
+        articalCount: 0,
+        countRate: 0,
+      };
+      obj.articalCount = data[1].length;
+      obj.userCount = data[2].length;
+
+      let index1 = 0;
+      let index2 = 0;
+      let index3 = 0;
+      let index4 = 0;
+      data[0].forEach((item) => {
+        if (item.status && item.status == "1") {
+          index1++;
         }
-        if(item.status == '3'){
-          index2++
+        if (item.status == "3") {
+          index2++;
         }
-      })
-      data[3].forEach(item=>{
-        if(item.status && item.status == '1'){
-          index3++
+      });
+      data[3].forEach((item) => {
+        if (item.status && item.status == "1") {
+          index3++;
         }
-        if(item.status == '3'){
-          index4++
+        if (item.status == "3") {
+          index4++;
         }
-      })
-      obj.countRate = Number(((index2+index4)*100/(index1+index3)))
-      obj.goodsCount = index1 + index2 + index3 + index4
+      });
+      obj.countRate = Number(((index2 + index4) * 100) / (index1 + index3));
+      obj.goodsCount = index1 + index2 + index3 + index4;
       res.send({
-        status:200,
-        message:'获取成功',
-        data:obj
-      })
+        status: 200,
+        message: "获取成功",
+        data: obj,
+      });
     }
-  }
+  };
   connection.sqlConnect(sqlStr, paramsArr, callback);
-}
+};
+sqlApi.getArticals = (res) => {
+  let sqlStr = "SELECT * FROM artical";
+  let paramsArr = [];
+  let callback = (err, data) => {
+    if (err) {
+      console.log(err);
+    } else {
+      data = JSON.parse(JSON.stringify(data));
+      data.forEach((item) => {
+        if (item.contentimg !== null) {
+          item.imgList = item.contentimg.split(",");
+        }
+      });
+      res.send({
+        status: 200,
+        message: "获取成功！",
+        data: data,
+      });
+    }
+  };
+  connection.sqlConnect(sqlStr, paramsArr, callback);
+};
 module.exports = sqlApi;

@@ -60,9 +60,9 @@
 					title="编辑信息" isLink></u-cell>
 				<u-cell @click="editPassword" :iconStyle="iconStyle" :titleStyle="titleStyle" icon="lock" title="找回密码"
 					isLink></u-cell>
-				<u-cell :iconStyle="iconStyle" :titleStyle="titleStyle" icon="question" title="帮助" isLink>
+				<u-cell :iconStyle="iconStyle" :titleStyle="titleStyle" icon="question" title="隐私政策" isLink>
 				</u-cell>
-				<u-cell :iconStyle="iconStyle" :titleStyle="titleStyle" icon="error" title="关于" isLink
+				<u-cell :iconStyle="iconStyle" :titleStyle="titleStyle" icon="error" title="关于我们" isLink
 					:border="false"></u-cell>
 			</u-cell-group>
 		</view>

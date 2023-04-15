@@ -15,6 +15,7 @@ router.post('/getComment',function(req,res,next){
     let id = req.body.params.id
     sqlApi.getComment(res,id)
 })
+
 //文章点赞
 router.post('/thumbsUp',function(req,res,next){
     let data = req.body.params.obj
@@ -35,5 +36,9 @@ router.post('/sendComment',function(req,res,next){
     let data = req.body.params.obj
     sqlApi.sendComment(res,data)
 })
-
+//发表回复
+router.post('/sendReply',function(req,res,next){
+    let data = req.body.params.obj
+    sqlApi.sendReply(res,data)
+})
 module.exports = router;
